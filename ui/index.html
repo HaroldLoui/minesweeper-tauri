@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>扫雷</title>
+</head>
+<body>
+    <h1 id="title">扫雷</h1>
+</body>
+<script>
+    const { listen } = window.__TAURI__.event;
+    // choose-mode
+    const unlisten = async () => {
+        return await listen('choose-mode', (event) => {
+            // console.log(event);
+            const { message, game_mode } = event.payload;
+            console.log(message);
+            console.log(game_mode);
+            document.getElementById('title').innerHTML = message;
+        });
+    };
+    unlisten();
+
+</script>
+</html>
