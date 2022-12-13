@@ -1,41 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>扫雷</title>
-    <link rel="stylesheet" href="css/index.css">
-</head>
-<body>
+    <link rel="stylesheet" href="css/index.css" />
+  </head>
+  <body>
     <div class="game-header">
-        <div class="header-common game-mine-number">
-            <div style="display: flex;justify-content: center;">
-                <img width="25" height="50" src="assets/digit0.png" id="n-bai"/>
-                <img width="25" height="50" src="assets/digit0.png" id="n-shi"/>
-                <img width="25" height="50" src="assets/digit0.png" id="n-ge"/>
-            </div>
+      <div class="header-common game-mine-number">
+        <div style="display: flex; justify-content: center">
+          <img width="25" height="50" src="assets/digit0.png" id="n-bai" />
+          <img width="25" height="50" src="assets/digit0.png" id="n-shi" />
+          <img width="25" height="50" src="assets/digit0.png" id="n-ge" />
         </div>
-        <div class="header-common game-status">
-            <button type="button" onclick="startGame()">
-                <img width="30" height="30" src="assets/smile.png" id="status"/>
-            </button>
+      </div>
+      <div class="header-common game-status">
+        <button type="button" onclick="startGame()">
+          <img width="30" height="30" src="assets/smile.png" id="status" />
+        </button>
+      </div>
+      <div class="header-common game-time">
+        <div style="display: flex; justify-content: center">
+          <img width="25" height="50" src="assets/digit0.png" id="t-qian" />
+          <img width="25" height="50" src="assets/digit0.png" id="t-bai" />
+          <img width="25" height="50" src="assets/digit0.png" id="t-shi" />
+          <img width="25" height="50" src="assets/digit0.png" id="t-ge" />
         </div>
-        <div class="header-common game-time">
-            <div style="display: flex;justify-content: center;">
-                <img width="25" height="50" src="assets/digit0.png" id="t-qian"/>
-                <img width="25" height="50" src="assets/digit0.png" id="t-bai"/>
-                <img width="25" height="50" src="assets/digit0.png" id="t-shi"/>
-                <img width="25" height="50" src="assets/digit0.png" id="t-ge"/>
-            </div>
-        </div>
+      </div>
     </div>
     <div class="game-content">
-        <div id="canvas">雷区</div>    
-        <button>
-            <img width="30" height="30" src="assets/smile.png" />
-        </button>
+      <canvas id="mines-canvas"></canvas>
     </div>
-</body>
-<script type="text/javascript" src="js/event.js"></script>
-<script type="text/javascript" src="js/index.js"></script>
+  </body>
+  <script type="text/javascript" src="js/event.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
 </html>

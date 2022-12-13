@@ -3,13 +3,20 @@
     windows_subsystem = "windows"
 )]
 
-use tauri::{CustomMenuItem, Menu, MenuItem, PhysicalSize, Size, Submenu, Window};
+use tauri::{
+    Window,
+    CustomMenuItem, Menu, MenuItem, Submenu,
+    Size, PhysicalSize
+};
 
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
-struct Payload {
-    message: String,
-    game_mode: String,
+struct GameInfo {
+    level: u32, // 等级
+    row: u32,   // 行
+    col: u32,   // 列
+    mines: u32, // 雷数量
+    cheat: u32, // 可作弊次数
 }
 
 fn main() {
@@ -40,46 +47,58 @@ fn main() {
                 "simple" => {
                     println!("选择了初级模式");
                     let size = Size::Physical(PhysicalSize {
-                        width: 200 , height: 200,
+                        width: 400 , height: 450,
                     });
-                    let payload = Payload {
-                        message: "初级".into(),
-			            game_mode: "simple".into(),
+                    let info = GameInfo {
+                        level: 1,
+                        row: 10,
+                        col: 10,
+                        mines: 10,
+                        cheat: 0
                     };
-                    choose_mode(window, size, payload);
+                    choose_mode(window, size, info);
                 }
                 "medium" => {
                     println!("选择了中级模式");
                     let size = Size::Physical(PhysicalSize {
-                        width: 300 , height: 300,
+                        width: 640 , height: 690,
                     });
-                    let payload = Payload {
-                        message: "中级".into(),
-			            game_mode: "medium".into(),
+                    let info = GameInfo {
+                        level: 1,
+                        row: 16,
+                        col: 16,
+                        mines: 40,
+                        cheat: 3
                     };
-                    choose_mode(window, size, payload);
+                    choose_mode(window, size, info);
                 }
                 "hard" => {
                     println!("选择了高级模式");
                     let size = Size::Physical(PhysicalSize {
-                        width: 400 , height: 400,
+                        width: 1300 , height: 690,
                     });
-                    let payload = Payload {
-                        message: "高级".into(),
-			            game_mode: "hard".into(),
+                    let info = GameInfo {
+                        level: 1,
+                        row: 16,
+                        col: 30,
+                        mines: 99,
+                        cheat: 5
                     };
-                    choose_mode(window, size, payload);
+                    choose_mode(window, size, info);
                 }
                 "full_screen" => {
                     println!("选择了满屏模式");
                     let size = Size::Physical(PhysicalSize {
-                        width: 500 , height: 500,
+                        width: 1200 , height: 690,
                     });
-                    let payload = Payload {
-                        message: "满屏".into(),
-			            game_mode: "full_screen".into(),
+                    let info = GameInfo {
+                        level: 1,
+                        row: 10,
+                        col: 10,
+                        mines: 10,
+                        cheat: 0
                     };
-                    choose_mode(window, size, payload);
+                    choose_mode(window, size, info);
                 }
                 _ => {}
             }
@@ -88,8 +107,9 @@ fn main() {
         .expect("error while running tauri application");
 }
 
-fn choose_mode(window: &Window, size: Size, payload: Payload) {
+fn choose_mode(window: &Window, size: Size, info: GameInfo) {
     window.set_size(size).unwrap();
-    window.emit("choose-mode", payload).unwrap();
+    // window.center().unwrap();
+    window.emit("choose-mode", info).unwrap();
 }
 
