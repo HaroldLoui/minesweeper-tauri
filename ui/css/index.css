@@ -12,6 +12,7 @@
     padding-bottom: 5px;
     background-color: #ccc;
     border-radius: 5px;
+    cursor: default;
 }
 
 .header {
@@ -103,61 +104,62 @@ td {
     background: #ccc;
     border: 2px solid;
     border-color: #fff #a1a1a1 #a1a1a1 #fff;
-    font-size: 14px;
-    line-height: 14px;
-    text-align: center;
-    font-weight: bold;
 }
 
-td.zero {
+td>div {
+    width: 100%;
+    height: 100%;
+    border: 2px solid;
     border-color: #d9d9d9;
-    background: #d9d9d9;
+    background: #ccc;
 }
 
-td.one {
-    border-color: #d9d9d9;
-    background: #d9d9d9;
-    color: #0000ff;
+td>div.zero {
+    /* background: #d9d9d9; */
+    background: url("../images/empty.png") center/cover no-repeat;
 }
 
-td.two {
-    border-color: #d9d9d9;
-    background: #d9d9d9;
-    color: #007b00;
+td>div.one {
+    background: url("../images/open1.png") center/cover no-repeat;
 }
 
-td.three {
-    border-color: #d9d9d9;
-    background: #d9d9d9;
-    color: #ff0000;
+td>div.two {
+    background: url("../images/open2.png") center/cover no-repeat;
 }
 
-td.four {
-    border-color: #d9d9d9;
-    background: #d9d9d9;
-    color: #00007b;
+td>div.three {
+    background: url("../images/open3.png") center/cover no-repeat;
 }
 
-td.five {
-    border-color: #d9d9d9;
-    background: #d9d9d9;
-    color: #7b0000;
+td>div.four {
+    background: url("../images/open4.png") center/cover no-repeat;
 }
 
-td.six {
-    border-color: #d9d9d9;
-    background: #d9d9d9;
-    color: #007b7b;
+td>div.five {
+    background: url("../images/open5.png") center/cover no-repeat;
 }
 
-td.seven {
-    border-color: #d9d9d9;
-    background: #d9d9d9;
-    color: #000000;
+td>div.six {
+    background: url("../images/open6.png") center/cover no-repeat;
 }
 
-td.eight {
-    border-color: #d9d9d9;
-    background: #d9d9d9;
-    color: #7b7b7b;
+td>div.seven {
+    background: url("../images/open7.png") center/cover no-repeat;
+}
+
+td>div.eight {
+    background: url("../images/open8.png") center/cover no-repeat;
+}
+
+td>div.mine {
+    opacity: 0.2;
+    background: url("../images/mine.png") center/cover no-repeat;
+}
+
+td>div.flag {
+    background: url("../images/flag.png") center/cover no-repeat;
+}
+
+td>div.question {
+    background: url("../images/question.png") center/cover no-repeat;
 }

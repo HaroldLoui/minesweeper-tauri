@@ -15,6 +15,9 @@ const mineNumDom = document.querySelector(".mineNum");
 // 雷区元素
 const mineAreaDom = document.querySelector(".content");
 
+// 游戏是否失败
+var isDead = false;
+
 // 初始化函数
 function init() {
     clearTimeInterval();
@@ -34,7 +37,7 @@ function resetWidth() {
 }
 
 // 表格每个格子的信息
-var tdsArr = [];
+var tableData = [];
 // 绘制表格
 function drawTable() {
     var table = document.createElement("table");
@@ -42,23 +45,23 @@ function drawTable() {
     // console.log(array);
     for (var i = 0; i < level.row; i++) {
         var tr = document.createElement("tr");
-        tdsArr[i] = [];
+        tableData[i] = [];
         for (var j = 0; j < level.col; j++) {
+            var isMine = array[i][j] === 9;
             var td = document.createElement("td");
-            tdsArr[i][j] = td;
-            td.pos = {i, j};        // 当前格子的坐标
-            td.type = array[i][j] === 9 ? "mine" : "number"; // 当前格子的类型
-            td.value = array[i][j]; // 当前格子的值
-            td.isOpen = false;      // 当前格子有没有被打开
-            td.isFlag = false;      // 当前格子有没有被插旗
-            // td.innerHTML = array[i][j];
-            td.onmousedown = (e) => {
-                // td.innerHTML = '2';
-                // td.className = "two";
-                // console.log(this);
-                // console.log(e);
-                play(e, td);
+            var div = document.createElement("div");
+            div.dataset.id = i * level.col + j;
+            if (isMine) {
+                div.classList.add("mine");
+            }
+            td.appendChild(div);
+            var obj = {
+                type: isMine ? "mine" : "number", // 当前格子的类型
+                value: array[i][j], // 当前格子的值
+                isOpen: false,      // 当前格子有没有被打开
+                rightStatus: 0,     // 当前格子的右键状态 0-无，1-旗帜，2-问号
             };
+            tableData[i][j] = obj;
             tr.appendChild(td);
         }
         table.appendChild(tr);
@@ -119,14 +122,6 @@ function shuffle(arr){
 function inArea(x, y) {
     return x >= 0 && x < level.row && 
            y >= 0 && y < level.col;
-}
-
-function play(ev, obj) {
-    console.log(ev.which);
-    console.log(ev.target);
-    console.log(obj);
-    obj.innerHTML = "2";
-    obj.className = "six";
 }
 
 // 时间相关
@@ -199,7 +194,8 @@ function bindEvent() {
     cancelContextMenu();
     // 绑定笑脸点击事件
     bindStatusEvent();
-    
+    // 绑定游玩逻辑事件
+    play();
 }
 
 // 取消右键菜单
@@ -213,14 +209,82 @@ function cancelContextMenu() {
  * 笑脸点击事件
  */
 function bindStatusEvent() {
+    var statusImg = statusBtn.children[0];
+    isDead = false;
     statusBtn.onmousedown = () => {
         // 鼠标点击的时候更改边框样式
         statusDom.style.borderColor = "#808080 #fff #fff #808080";
+        statusImg.style.backgroundImage = "url('images/smile.png')";
         init();
     };
     statusBtn.onmouseup = () => {
         // 点击的时候更改边框样式
         statusDom.style.borderColor = "#fff #808080 #808080 #fff";
+    };
+}
+
+// 获取格子上的数据信息
+function getDataByCell(cell) {
+    var index = cell.dataset.id;
+    var x = Math.floor(index / level.col);
+    var y = index % level.col;
+    return tableData[x][y];
+}
+
+// 左键点击事件
+function leftClick(cell) {
+    // console.log(cell.dataset.id);
+    var cellData = getDataByCell(cell);
+    console.log(cellData);
+    // 如果是雷，游戏失败
+    if (cellData.type === "mine") {
+        gameOver();
+    }
+    // cell.parentNode.style.border = "none";
+    // cell.className = "zero";
+}
+
+// 游戏结束
+function gameOver() {
+    isDead = true;
+    // 显示所有雷
+    var allDiv = document.querySelectorAll(".mine");
+    allDiv.forEach((dom) => {
+        dom.style.opacity = 1;
+    });
+    // 笑脸改成失败笑脸
+    // console.log(statusBtn.children[0])
+    var statusImg = statusBtn.children[0];
+    statusImg.style.backgroundImage = "url('images/dead.png')";
+}
+
+// 游玩逻辑
+function play() {
+    // console.log(contentDom.firstChild);
+    var statusImg = statusBtn.children[0];
+    contentDom.firstChild.onmousedown = (e) => {
+        // 每次鼠标按下时更改笑脸的样式
+        statusImg.style.backgroundImage = "url('images/ohh.png')";
+        // 鼠标左键
+        if (e.button === 0) {
+            leftClick(e.target);
+        }
+
+        // 鼠标中键
+        if (e.button === 1) {
+            // midClick();
+        }
+
+        // 鼠标右键
+        if (e.button === 2) {
+
+        }
+    };
+    contentDom.firstChild.onmouseup = () => {
+        // 每次鼠标松开后更改回笑脸的样式
+        if (!isDead) { // 如果游戏失败
+            statusImg.style.backgroundImage = "url('images/smile.png')";
+        }
     };
 }
 
