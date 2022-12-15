@@ -12,7 +12,6 @@ use tauri::{
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
 struct GameInfo {
-    level: u32, // 等级
     row: u32,   // 行
     col: u32,   // 列
     mines: u32, // 雷数量
@@ -50,7 +49,6 @@ fn main() {
                         width: 400 , height: 450,
                     });
                     let info = GameInfo {
-                        level: 1,
                         row: 10,
                         col: 10,
                         mines: 10,
@@ -64,7 +62,6 @@ fn main() {
                         width: 640 , height: 690,
                     });
                     let info = GameInfo {
-                        level: 1,
                         row: 16,
                         col: 16,
                         mines: 40,
@@ -78,7 +75,6 @@ fn main() {
                         width: 1300 , height: 690,
                     });
                     let info = GameInfo {
-                        level: 1,
                         row: 16,
                         col: 30,
                         mines: 99,
@@ -92,7 +88,6 @@ fn main() {
                         width: 1200 , height: 690,
                     });
                     let info = GameInfo {
-                        level: 1,
                         row: 10,
                         col: 10,
                         mines: 10,

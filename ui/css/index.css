@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #F7F7F0;
+    background-color: #f7f7f0;
 }
 
 .container {
@@ -50,17 +50,17 @@
 
 .status {
     background-color: #ccc;
-    width: 30px; 
+    width: 30px;
     height: 30px;
     border: 3px solid;
-    border-color:#fff #808080 #808080 #fff;
+    border-color: #fff #808080 #808080 #fff;
 }
 
 .status button {
     width: 30px;
     height: 25px;
     margin: 0 auto;
-    background-color: #ccc; 
+    background-color: #ccc;
     border: none;
 }
 
@@ -72,7 +72,7 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    background-color: #ccc; 
+    background-color: #ccc;
 }
 
 .timeNum {
@@ -89,68 +89,75 @@
     border-color: #a1a1a1 #fff #fff #a1a1a1;
 }
 
-table{
-    /* 格子之间的缝隙 */
-    /* width: 100%; */
+table {
     margin: 0 auto;
+    /* 格子之间的缝隙 */
     border-spacing: 1px;
     background: #ccc;
-
 }
 
 td {
     padding: 0;
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     background: #ccc;
-    border: 3px solid;
+    border: 2px solid;
     border-color: #fff #a1a1a1 #a1a1a1 #fff;
-    line-height: 20px;
+    font-size: 14px;
+    line-height: 14px;
     text-align: center;
     font-weight: bold;
 }
 
-td.zero{
-    border-color:#d9d9d9;
-    background:#d9d9d9;
+td.zero {
+    border-color: #d9d9d9;
+    background: #d9d9d9;
 }
-td.one{
-   border-color:#d9d9d9;
-   background:#d9d9d9;
-   color: #0000FF;
+
+td.one {
+    border-color: #d9d9d9;
+    background: #d9d9d9;
+    color: #0000ff;
 }
+
 td.two {
-   border-color: #d9d9d9;
-   background: #d9d9d9;
-   color: #007B00;
+    border-color: #d9d9d9;
+    background: #d9d9d9;
+    color: #007b00;
 }
+
 td.three {
-   border-color: #d9d9d9;
-   background: #d9d9d9;
-   color: #FF0000;
+    border-color: #d9d9d9;
+    background: #d9d9d9;
+    color: #ff0000;
 }
+
 td.four {
-   border-color: #d9d9d9;
-   background: #d9d9d9;
-   color: #00007B;
+    border-color: #d9d9d9;
+    background: #d9d9d9;
+    color: #00007b;
 }
+
 td.five {
-   border-color: #d9d9d9;
-   background: #d9d9d9;
-   color: #7B0000;
+    border-color: #d9d9d9;
+    background: #d9d9d9;
+    color: #7b0000;
 }
+
 td.six {
-   border-color: #d9d9d9;
-   background: #d9d9d9;
-   color: #007B7B;
+    border-color: #d9d9d9;
+    background: #d9d9d9;
+    color: #007b7b;
 }
+
 td.seven {
-   border-color: #d9d9d9;
-   background: #d9d9d9;
-   color: #000000;
+    border-color: #d9d9d9;
+    background: #d9d9d9;
+    color: #000000;
 }
+
 td.eight {
-   border-color: #d9d9d9;
-   background: #d9d9d9;
-   color: #7B7B7B;
+    border-color: #d9d9d9;
+    background: #d9d9d9;
+    color: #7b7b7b;
 }

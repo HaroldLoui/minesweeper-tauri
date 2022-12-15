@@ -1,4 +1,3 @@
-
 // 全局dom元素获取
 // 容器dom
 const containerDom = document.querySelector(".container");
@@ -16,66 +15,19 @@ const mineNumDom = document.querySelector(".mineNum");
 // 雷区元素
 const mineAreaDom = document.querySelector(".content");
 
-
+// 初始化函数
 function init() {
     clearTimeInterval();
     // startTime();
-    getLevel(0);
+    resetWidth();
     drawTable();
 }
 
-// 当前游戏级别
-var level = {};
-
 /**
- * 选择游戏级别
- * @param {Number} l 0-初级 1-中级 2-高级 3-满屏 4-自定义 
+ * 根据游戏绘制不同的宽度
  */
-function getLevel(l) {
-    switch (l) {
-        case 0:
-            level = {
-                row: 10,   // 行数
-                col: 10,   // 列数
-                mines: 10, // 雷数
-                cheat: 0   // 可作弊次数
-            };
-            break;
-        case 1:
-            level = {
-                row: 16,
-                col: 16,
-                mines: 40,
-                cheat: 2
-            };
-            break;
-        case 2:
-            level = {
-                row: 16,
-                col: 30,
-                mines: 99,
-                cheat: 0
-            };
-            break;
-        case 3:
-            level = {
-                row: 16,
-                col: 30,
-                mines: 99,
-                cheat: 0
-            };
-            break;
-        default:
-            level = {
-                row: 10,
-                col: 10,
-                mines: 10,
-                cheat: 0
-            };
-            break;
-    }
-    // 根据游戏绘制不同的宽度
-    const width = level.col * 25 + 4;
+function resetWidth() {
+    const width = level.col * 30 + 4;
     headerDom.style.width = width + "px";
     contentDom.style.width = width + "px";
     containerDom.style.width = width + 20 + "px";
@@ -92,7 +44,6 @@ function drawTable() {
         var tr = document.createElement("tr");
         tdsArr[i] = [];
         for (var j = 0; j < level.col; j++) {
-            // var index = i * level.col + j;
             var td = document.createElement("td");
             tdsArr[i][j] = td;
             td.pos = {i, j};        // 当前格子的坐标
@@ -100,18 +51,19 @@ function drawTable() {
             td.value = array[i][j]; // 当前格子的值
             td.isOpen = false;      // 当前格子有没有被打开
             td.isFlag = false;      // 当前格子有没有被插旗
-            td.innerHTML = array[i][j];
-            // td.onmousedown = (e) => {
-            //     // td.innerHTML = '1';
-            //     // td.className = "one";
-            //     // console.log(this);
-            //     // console.log(e);
-            //     play(e, td);
-            // };
+            // td.innerHTML = array[i][j];
+            td.onmousedown = (e) => {
+                // td.innerHTML = '2';
+                // td.className = "two";
+                // console.log(this);
+                // console.log(e);
+                play(e, td);
+            };
             tr.appendChild(td);
         }
         table.appendChild(tr);
     }
+    // 防止重复添加表格
     mineAreaDom.innerHTML = "";
     mineAreaDom.appendChild(table);
 }
@@ -173,8 +125,8 @@ function play(ev, obj) {
     console.log(ev.which);
     console.log(ev.target);
     console.log(obj);
-    obj.innerHTML = "1";
-    obj.className = "one";
+    obj.innerHTML = "2";
+    obj.className = "six";
 }
 
 // 时间相关
