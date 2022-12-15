@@ -1,38 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>扫雷</title>
-    <link rel="stylesheet" href="css/index.css" />
-  </head>
-  <body>
-    <div class="game-header">
-      <div class="header-common game-mine-number">
-        <div style="display: flex; justify-content: center">
-          <img width="25" height="50" src="assets/digit0.png" id="n-bai" />
-          <img width="25" height="50" src="assets/digit0.png" id="n-shi" />
-          <img width="25" height="50" src="assets/digit0.png" id="n-ge" />
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="info mineNum">
+                <div class="digit-img"></div>
+                <div class="digit-img"></div>
+                <div class="digit-img"></div>
+            </div>
+            <div class="info status">
+                <button id="statusBtn">
+                    <div class="status-img"></div>
+                </button>
+            </div>
+            <div class="info timeNum">
+                <div class="digit-img"></div>
+                <div class="digit-img"></div>
+                <div class="digit-img"></div>
+            </div>
         </div>
-      </div>
-      <div class="header-common game-status">
-        <button type="button" onclick="startGame()">
-          <img width="30" height="30" src="assets/smile.png" id="status" />
-        </button>
-      </div>
-      <div class="header-common game-time">
-        <div style="display: flex; justify-content: center">
-          <img width="25" height="50" src="assets/digit0.png" id="t-qian" />
-          <img width="25" height="50" src="assets/digit0.png" id="t-bai" />
-          <img width="25" height="50" src="assets/digit0.png" id="t-shi" />
-          <img width="25" height="50" src="assets/digit0.png" id="t-ge" />
-        </div>
-      </div>
+        <div class="content"></div>
     </div>
-    <div class="game-content">
-      <canvas id="mines-canvas"></canvas>
+    <!-- 预加载图片 -->
+    <div style="display: none;">
+        <img src="images/digit0.png">
+        <img src="images/digit1.png">
+        <img src="images/digit2.png">
+        <img src="images/digit3.png">
+        <img src="images/digit4.png">
+        <img src="images/digit5.png">
+        <img src="images/digit6.png">
+        <img src="images/digit7.png">
+        <img src="images/digit8.png">
+        <img src="images/digit9.png">
     </div>
-  </body>
-  <script type="text/javascript" src="js/event.js"></script>
-  <script type="text/javascript" src="js/index.js"></script>
+    <script src="js/index.js"></script>
+</body>
 </html>

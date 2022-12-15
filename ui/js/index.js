@@ -1,194 +1,283 @@
-const { listen } = window.__TAURI__.event;
 
-let minesArea = [];
-let info = {
-  level: 1,
-  row: 10,
-  col: 10,
-  mines: 10,
-  cheat: 0
-};
+// 全局dom元素获取
+// 容器dom
+const containerDom = document.querySelector(".container");
+// headerDom
+const headerDom = document.querySelector(".header");
+// contentDom
+const contentDom = document.querySelector(".content");
+// 笑脸按钮元素
+const statusBtn = document.querySelector("#statusBtn");
+const statusDom = document.querySelector(".status");
+// 时间状态元素
+const timeNumDom = document.querySelector(".timeNum");
+// 剩余雷数元素
+const mineNumDom = document.querySelector(".mineNum");
+// 雷区元素
+const mineAreaDom = document.querySelector(".content");
 
-// choose-mode
-const unlisten = async () => {
-  return await listen("choose-mode", (event) => {
-    // console.log(event.payload);
-    info = event.payload;
-    console.log(info);
-    init();
-  });
-};
-unlisten();
-
-const BLOCK_WIDTH = 40;
-const BLOCK_HEIGHT = 40;
-
-const canvas = document.getElementById("mines-canvas");
-const ctx = canvas.getContext("2d");
 
 function init() {
-  // console.log("3333333", info);
-  canvas.width = info.col * BLOCK_WIDTH;
-  // canvas.width = 1300;
-  canvas.height = info.row * BLOCK_HEIGHT;
-  console.log("4444444", canvas.width)
-  ctx.fillStyle = "aliceblue";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  minesArea = generateMines();
+    clearTimeInterval();
+    // startTime();
+    getLevel(0);
+    drawTable();
 }
 
-init();
+// 当前游戏级别
+var level = {};
 
-function drawMineNumber(number) {
-  var bai = parseInt(number / 100);
-  var shi = parseInt((number % 100) / 10);
-  var ge = number % 10;
-
-  var bDom = document.getElementById("n-bai");
-  var sDom = document.getElementById("n-shi");
-  var gDom = document.getElementById("n-ge");
-
-  bDom.src = "assets/digit" + bai + ".png";
-  sDom.src = "assets/digit" + shi + ".png";
-  gDom.src = "assets/digit" + ge + ".png";
-}
-
-function drawTime(time) {
-  var qian = parseInt(time / 1000);
-  var bai = parseInt((time % 1000) / 100);
-  var shi = parseInt((time % 100) / 10);
-  var ge = time % 10;
-
-  var qDom = document.getElementById("t-qian");
-  var bDom = document.getElementById("t-bai");
-  var sDom = document.getElementById("t-shi");
-  var gDom = document.getElementById("t-ge");
-
-  qDom.src = "assets/digit" + qian + ".png";
-  bDom.src = "assets/digit" + bai + ".png";
-  sDom.src = "assets/digit" + shi + ".png";
-  gDom.src = "assets/digit" + ge + ".png";
-}
-
-var timeId = null;
-
-// 当第一次点击时间才正式开始
-function resetTime() {
-  if (timeId != null) {
-    clearInterval(timeId);
-  }
-  var curTime = 0;
-  timeId = setInterval(() => {
-    curTime++;
-    if (curTime <= 9999) {
-      drawTime(curTime);
-    } else {
-      clearInterval(timeId);
+/**
+ * 选择游戏级别
+ * @param {Number} l 0-初级 1-中级 2-高级 3-满屏 4-自定义 
+ */
+function getLevel(l) {
+    switch (l) {
+        case 0:
+            level = {
+                row: 10,   // 行数
+                col: 10,   // 列数
+                mines: 10, // 雷数
+                cheat: 0   // 可作弊次数
+            };
+            break;
+        case 1:
+            level = {
+                row: 16,
+                col: 16,
+                mines: 40,
+                cheat: 2
+            };
+            break;
+        case 2:
+            level = {
+                row: 16,
+                col: 30,
+                mines: 99,
+                cheat: 0
+            };
+            break;
+        case 3:
+            level = {
+                row: 16,
+                col: 30,
+                mines: 99,
+                cheat: 0
+            };
+            break;
+        default:
+            level = {
+                row: 10,
+                col: 10,
+                mines: 10,
+                cheat: 0
+            };
+            break;
     }
-  }, 1000);
+    // 根据游戏绘制不同的宽度
+    const width = level.col * 25 + 4;
+    headerDom.style.width = width + "px";
+    contentDom.style.width = width + "px";
+    containerDom.style.width = width + 20 + "px";
 }
 
-// 绘制雷区
-function drawMines() {
-  // const minesArea = minesArea;
-  console.log(info)
-  for (var i = 0; i < info.row; i++) {
-    for (var j = 0; j < info.col; j++) {
-      ctx.font = "14px serif";
-      ctx.strokeStyle = "#ccc";
-      ctx.strokeRect(BLOCK_WIDTH * i, BLOCK_HEIGHT * j, BLOCK_WIDTH, BLOCK_HEIGHT);
-      drawBlock(minesArea[i][j], i, j);
+// 表格每个格子的信息
+var tdsArr = [];
+// 绘制表格
+function drawTable() {
+    var table = document.createElement("table");
+    var array = createMines();
+    // console.log(array);
+    for (var i = 0; i < level.row; i++) {
+        var tr = document.createElement("tr");
+        tdsArr[i] = [];
+        for (var j = 0; j < level.col; j++) {
+            // var index = i * level.col + j;
+            var td = document.createElement("td");
+            tdsArr[i][j] = td;
+            td.pos = {i, j};        // 当前格子的坐标
+            td.type = array[i][j] === 9 ? "mine" : "number"; // 当前格子的类型
+            td.value = array[i][j]; // 当前格子的值
+            td.isOpen = false;      // 当前格子有没有被打开
+            td.isFlag = false;      // 当前格子有没有被插旗
+            td.innerHTML = array[i][j];
+            // td.onmousedown = (e) => {
+            //     // td.innerHTML = '1';
+            //     // td.className = "one";
+            //     // console.log(this);
+            //     // console.log(e);
+            //     play(e, td);
+            // };
+            tr.appendChild(td);
+        }
+        table.appendChild(tr);
     }
-  }
+    mineAreaDom.innerHTML = "";
+    mineAreaDom.appendChild(table);
 }
 
 // 生成雷区
-function generateMines() {
-  // 初始化二维数组
-  console.log("111111", info)
-  var rows = [];
-  for (var i = 0; i < info.row; i++) {
-    var cols = [];
-    for (var j = 0; j < info.col; j++) {
-      cols[j] = 0;
-    }
-    rows[i] = cols;
-  }
-  // 初始化一维数组并通过shuffle算法生成雷区
-  var array = new Array(info.row * info.col);
-  array.fill(0);
-  for (var n = 0; n < info.mines; n++) {
-    array[n] = "m";
-  }
-  array = shuffle(array);
-  // console.log(array);
-  // 将一维雷区映射到二维上
-  for (var i = 0; i < array.length; i++) {
-    var newX = parseInt(i / info.col);
-    var newY = i % info.col;
-    rows[newX][newY] = array[i];
-  }
-  // console.log(rows);
-  // 遍历雷区生成数字
-  for (var i = 0; i < info.row; i++) {
-    for (var j = 0; j < info.col; j++) {
-      if (rows[i][j] === "m") {
-        // 如果是雷，则将周围八个非雷的格子数字+1
-        for (var x = i - 1; x <= i + 1; x++) {
-          for (var y = j - 1; y <= j + 1; y++) {
-            if (inArea(x, y) && rows[x][y] !== "m") {
-              rows[x][y] += 1;
-            }
-          }
+function createMines() {
+    // 使用洗牌算法生成雷区的一维数组
+    var array = new Array(level.row * level.col);
+    array.fill(0);
+    array.fill(9, 0, level.mines);
+    array = shuffle(array);
+    // 将雷区一维数组转成二维数组
+    var mineArray = [];
+    for (var i = 0; i < level.row; i++) {
+        var cols = [];
+        for (var j = 0; j < level.col; j++) {
+            var index = i * level.col + j;
+            cols[j] = array[index] === 9 ? 9 : 0;
         }
-      }
+        mineArray[i] = cols;
     }
-  }
-  return rows;
+    // 生成每个雷周围的数字
+    for (var i = 0; i < level.row; i++) {
+        for (var j = 0; j < level.col; j++) {
+            if (mineArray[i][j] === 9) {
+                // 如果是雷，则将周围八个非雷的格子数字+1
+                for (var x = i - 1; x <= i + 1; x++) {
+                    for (var y = j - 1; y <= j + 1; y++) {
+                        if (inArea(x, y) && mineArray[x][y] !== 9) {
+                            mineArray[x][y] += 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return mineArray;
 }
 
+// 洗牌算法
+function shuffle(arr){
+    var result = [],
+        random;
+    while(arr.length > 0){
+        random = Math.floor(Math.random() * arr.length);
+        result.push(arr[random])
+        arr.splice(random, 1)
+    }
+    return result;
+}
+
+// 判断坐标是否合格
 function inArea(x, y) {
-  return x >= 0 && x < info.row && y >= 0 && y < info.col;
+    return x >= 0 && x < level.row && 
+           y >= 0 && y < level.col;
 }
 
-// 洗牌算法，打乱数组顺序
-function shuffle(array){
-  let res = [], random;
-  while(array.length>0){
-    random = Math.floor(Math.random()*array.length);
-    res.push(array[random]);
-    array.splice(random, 1);
-  }
-  return res;
+function play(ev, obj) {
+    console.log(ev.which);
+    console.log(ev.target);
+    console.log(obj);
+    obj.innerHTML = "1";
+    obj.className = "one";
 }
 
-// 绘制数字
-function drawBlock(n, x, y) {
-  const colors = [
-    "",
-    "#0000FF", // 1
-    "#007B00", // 2
-    "#FF0000", // 3
-    "#00007B", // 4
-    "#7B0000", // 5
-    "#007B7B", // 6
-    "#000000", // 7
-    "#7B7B7B", // 8
-  ];
-  if (n >= 0 && n <= 8) {
-    ctx.strokeStyle = colors[n];
-    if (n > 0) {
-      ctx.strokeText(n, 40*x+18, 40*y+23);
+// 时间相关
+var timeId = null;
+var curTime = 0;
+
+// 清除时间id
+function clearTimeInterval() {
+    curTime = 0;
+    if (timeId !== null) {
+        clearInterval(timeId);
     }
-  } else {
-    ctx.strokeStyle = "#000";
-    ctx.strokeText(n, 40*x+18, 40*y+23);
-  }
 }
 
-function startGame() {
-  init();
-  drawMines();
+// 启动时间
+function startTime() {
+    timeId = setInterval(() => {
+        curTime++;
+        if (curTime > 999) {
+            clearInterval(timeId);
+        } else {
+            drawDigit(curTime, 1);
+        }
+    }, 1000);
 }
 
-// startGame();
+// 数字图片路径
+const DIGIT_IMAGE_URLS = [
+    "url('images/digit0.png')",
+    "url('images/digit1.png')",
+    "url('images/digit2.png')",
+    "url('images/digit3.png')",
+    "url('images/digit4.png')",
+    "url('images/digit5.png')",
+    "url('images/digit6.png')",
+    "url('images/digit7.png')",
+    "url('images/digit8.png')",
+    "url('images/digit9.png')",
+];
+
+/**
+ * 绘制游戏状态区域的数字信息
+ * @param {Number} n 绘制的数字
+ * @param {Number} type 绘制的类型 0-剩余雷的数量 1-花费的时间
+ */
+function drawDigit(n, type) {
+    // 百位数
+    var b = parseInt(n / 100);
+    // 十位数
+    var s = parseInt((n / 10) % 10);
+    // 个位数
+    var g = n % 10;
+    // 根据类型绘制不同的区域
+    if (type === 0) {
+        var children = mineNumDom.children;
+        children[0].style.backgroundImage = DIGIT_IMAGE_URLS[b];
+        children[1].style.backgroundImage = DIGIT_IMAGE_URLS[s];
+        children[2].style.backgroundImage = DIGIT_IMAGE_URLS[g];
+    } else {
+        var children = timeNumDom.children;
+        children[0].style.backgroundImage = DIGIT_IMAGE_URLS[b];
+        children[1].style.backgroundImage = DIGIT_IMAGE_URLS[s];
+        children[2].style.backgroundImage = DIGIT_IMAGE_URLS[g];
+    }
+}
+
+// 绑定事件
+function bindEvent() {
+    // 取消浏览器自带鼠标右键菜单
+    cancelContextMenu();
+    // 绑定笑脸点击事件
+    bindStatusEvent();
+    
+}
+
+// 取消右键菜单
+function cancelContextMenu() {
+    containerDom.oncontextmenu = () => {
+        return false;
+    };
+}
+
+/**
+ * 笑脸点击事件
+ */
+function bindStatusEvent() {
+    statusBtn.onmousedown = () => {
+        // 鼠标点击的时候更改边框样式
+        statusDom.style.borderColor = "#808080 #fff #fff #808080";
+        init();
+    };
+    statusBtn.onmouseup = () => {
+        // 点击的时候更改边框样式
+        statusDom.style.borderColor = "#fff #808080 #808080 #fff";
+    };
+}
+
+// 主函数
+function main() {
+    // 初始化
+    init();
+    // 绑定事件
+    bindEvent();
+}
+
+main();

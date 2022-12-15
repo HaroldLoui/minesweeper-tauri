@@ -1,53 +1,156 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    background-color: #F7F7F0;
 }
 
-body {
+.container {
+    /* width: 270px; */
+    margin: 10px auto;
+    padding-top: 5px;
+    padding-bottom: 5px;
     background-color: #ccc;
-    width: 100%;
-    height: 100%;
+    border-radius: 5px;
 }
 
-.game-header {
-    width: 100%;
-    height: 51px;
+.header {
+    /* width: 250px; */
+    height: 50px;
+    margin: 5px auto;
+    background-color: #ccc;
+    border: 2px solid;
+    border-color: #a1a1a1 #fff #fff #a1a1a1;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: nowrap;
+    padding: 0 5px;
 }
 
-.header-common {
-    height: 95%;
-    width: 25px;
+.info {
+    height: 45px;
+    display: flex;
+    align-items: center;
 }
 
-.game-mine-number {
-    margin-left: 5px;
-    width: 75px;
+.digit-img {
+    width: 20px;
+    height: 80%;
+    background-image: url("../images/digit0.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 }
 
-.game-time {
-    margin-right: 5px;
-    width: 100px;
-}
-
-.game-status {
-    width: 35px;
-    height: 35px;
-    margin: 10px auto;
-    border: 2px solid #808080;
-}
-
-.game-status > button {
-    width: 100%;
-    height: 35px;
+.mineNum {
+    justify-content: start;
     background-color: #ccc;
+    width: 60px;
 }
 
-.game-content {
-    width: 100%;
-    height: 100vh;
-    background-color: aliceblue;
+.status {
+    background-color: #ccc;
+    width: 30px; 
+    height: 30px;
+    border: 3px solid;
+    border-color:#fff #808080 #808080 #fff;
+}
+
+.status button {
+    width: 30px;
+    height: 25px;
+    margin: 0 auto;
+    background-color: #ccc; 
+    border: none;
+}
+
+.status-img {
+    width: 20px;
+    height: 20px;
+    margin: auto;
+    background-image: url("../images/smile.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-color: #ccc; 
+}
+
+.timeNum {
+    justify-content: end;
+    background-color: #ccc;
+    width: 60px;
+}
+
+.content {
+    /* width: 250px; */
+    margin: 5px auto;
+    background-color: #ccc;
+    border: 2px solid;
+    border-color: #a1a1a1 #fff #fff #a1a1a1;
+}
+
+table{
+    /* 格子之间的缝隙 */
+    /* width: 100%; */
+    margin: 0 auto;
+    border-spacing: 1px;
+    background: #ccc;
+
+}
+
+td {
+    padding: 0;
+    width: 25px;
+    height: 25px;
+    background: #ccc;
+    border: 3px solid;
+    border-color: #fff #a1a1a1 #a1a1a1 #fff;
+    line-height: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+td.zero{
+    border-color:#d9d9d9;
+    background:#d9d9d9;
+}
+td.one{
+   border-color:#d9d9d9;
+   background:#d9d9d9;
+   color: #0000FF;
+}
+td.two {
+   border-color: #d9d9d9;
+   background: #d9d9d9;
+   color: #007B00;
+}
+td.three {
+   border-color: #d9d9d9;
+   background: #d9d9d9;
+   color: #FF0000;
+}
+td.four {
+   border-color: #d9d9d9;
+   background: #d9d9d9;
+   color: #00007B;
+}
+td.five {
+   border-color: #d9d9d9;
+   background: #d9d9d9;
+   color: #7B0000;
+}
+td.six {
+   border-color: #d9d9d9;
+   background: #d9d9d9;
+   color: #007B7B;
+}
+td.seven {
+   border-color: #d9d9d9;
+   background: #d9d9d9;
+   color: #000000;
+}
+td.eight {
+   border-color: #d9d9d9;
+   background: #d9d9d9;
+   color: #7B7B7B;
 }
