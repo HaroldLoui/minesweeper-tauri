@@ -17,9 +17,16 @@ const mineAreaDom = document.querySelector(".content");
 
 // 游戏是否失败
 var isDead = false;
+// 游戏是否胜利
+var isWin = false;
+// 当前被打开的格子数量，如果等于总格数-雷数量则游戏胜利
+var openNum = 0;
 
 // 初始化函数
 function init() {
+    openNum = 0;
+    isDead = false;
+    isWin = false;
     clearTimeInterval();
     // startTime();
     resetWidth();
@@ -40,9 +47,9 @@ function resetWidth() {
 var tableData = [];
 // 绘制表格
 function drawTable() {
+    tableData = [];
     var table = document.createElement("table");
     var array = createMines();
-    // console.log(array);
     for (var i = 0; i < level.row; i++) {
         var tr = document.createElement("tr");
         tableData[i] = [];
@@ -60,6 +67,8 @@ function drawTable() {
                 value: array[i][j], // 当前格子的值
                 isOpen: false,      // 当前格子有没有被打开
                 rightStatus: 0,     // 当前格子的右键状态 0-无，1-旗帜，2-问号
+                isSearch: false,    // 当前格子有没有被搜索过
+                cell: div,          // 格子信息
             };
             tableData[i][j] = obj;
             tr.appendChild(td);
@@ -210,12 +219,12 @@ function cancelContextMenu() {
  */
 function bindStatusEvent() {
     var statusImg = statusBtn.children[0];
-    isDead = false;
     statusBtn.onmousedown = () => {
         // 鼠标点击的时候更改边框样式
         statusDom.style.borderColor = "#808080 #fff #fff #808080";
         statusImg.style.backgroundImage = "url('images/smile.png')";
         init();
+        play();
     };
     statusBtn.onmouseup = () => {
         // 点击的时候更改边框样式
@@ -231,38 +240,142 @@ function getDataByCell(cell) {
     return tableData[x][y];
 }
 
+const NUMBER_STR = [ "zero", "one", "two", "three", "four", "five", "six", "seven", "eight" ];
+
 // 左键点击事件
 function leftClick(cell) {
     // console.log(cell.dataset.id);
     var cellData = getDataByCell(cell);
-    console.log(cellData);
+    // 被标了旗子或者问号则不能点击当前格子
+    if (cellData.rightStatus > 0) {
+        return;
+    }
     // 如果是雷，游戏失败
     if (cellData.type === "mine") {
-        gameOver();
+        // 游戏结束
+        gameOver(cell);
+        return;
     }
-    // cell.parentNode.style.border = "none";
-    // cell.className = "zero";
+    // 如果是数字类型
+    if (cellData.type === "number") {
+        // 搜索逻辑
+        search(cell, cellData);
+    }
+}
+
+// 八方向偏移量
+const d = [
+    [-1, -1], [ 0, -1], [ 1, -1], [-1,  0], 
+    [ 1,  0], [-1,  1], [ 0,  1], [ 1,  1]
+];
+// 搜索函数
+function search(cell, cellData) {
+    // 如果是数字1-7并且没有标记旗子和问号则直接打开并返回
+    var n = cellData.value;
+    // 标记了旗子和问号不能打开
+    if (cellData.rightStatus === 0) {
+        cell.classList.add(NUMBER_STR[n]);
+        cell.parentNode.style.border = "none";
+        cellData.isSearch = true;
+        openNum++;
+        if (openNum === level.row * level.col - level.mines) {
+            gameWin();
+        }
+    }
+    if (n !== 0) {
+        return;
+    }
+    // 是0执行搜索逻辑
+    var curX = Math.floor(cell.dataset.id / level.col);
+    var curY = cell.dataset.id % level.col;
+    for (var i = 0; i < 8; i++) {
+        var newX = curX + d[i][0];
+        var newY = curY + d[i][1];
+        if (inArea(newX, newY) && 
+            tableData[newX][newY].type === "number" && 
+            tableData[newX][newY].isSearch === false) {
+            var newCellData = tableData[newX][newY];
+            var newCell = newCellData.cell;
+            search(newCell, newCellData);
+        }
+    }
+}
+
+function gameWin() {
+    console.log("恭喜您，游戏胜利！！！");
+    isWin = true;
+    // 笑脸改成胜利
+    var statusImg = statusBtn.children[0];
+    statusImg.style.backgroundImage = "url('images/win.png')";
 }
 
 // 游戏结束
-function gameOver() {
+function gameOver(cell) {
+    // 全局游戏状态
     isDead = true;
-    // 显示所有雷
-    var allDiv = document.querySelectorAll(".mine");
-    allDiv.forEach((dom) => {
-        dom.style.opacity = 1;
-    });
-    // 笑脸改成失败笑脸
-    // console.log(statusBtn.children[0])
+    // 笑脸改成失败
     var statusImg = statusBtn.children[0];
     statusImg.style.backgroundImage = "url('images/dead.png')";
+    // 改变当前格子背景色
+    cell.parentNode.style.border = "none";
+    cell.parentNode.style.backgroundColor = "#FF0000";
+    cell.classList.remove("mine");
+    cell.classList.add("mine-death");
+    // 显示所有雷
+    var allMineDiv = document.querySelectorAll(".mine");
+    allMineDiv.forEach((dom) => {
+        dom.style.opacity = 1;
+        dom.parentNode.style.border = "none";
+    });
+    // 找到所有插错旗子的格子
+    var allFlagDiv = document.querySelectorAll(".flag");
+    allFlagDiv.forEach((dom) => {
+        var id = dom.dataset.id;
+        var x = Math.floor(id / level.col);
+        var y = id % level.col;
+        var obj = tableData[x][y];
+        // 旗子插在了数字上
+        if (obj.type === "number") {
+            dom.classList.remove("flag");
+            dom.classList.add("misflagged");
+        }
+    });
+}
+
+// 右键点击事件
+function rightClick(cell) {
+    var cellData = getDataByCell(cell);
+    cellData.rightStatus = (cellData.rightStatus + 1) % 3;
+    switch (cellData.rightStatus) {
+        // 0 空
+        case 0:
+            cell.classList.remove("question");
+            break;
+        // 1 旗子
+        case 1:
+            cell.classList.add("flag");
+            break;
+        // 2 问号
+        case 2:
+            cell.classList.remove("flag");
+            cell.classList.add("question");
+            break;
+        default:
+            break;
+    }
 }
 
 // 游玩逻辑
 function play() {
+    isDead = false;
+    isWin = false;
     // console.log(contentDom.firstChild);
     var statusImg = statusBtn.children[0];
     contentDom.firstChild.onmousedown = (e) => {
+        // 游戏胜利或者结束的话点击事件都不能生效
+        if (isDead || isWin) {
+            return;
+        }
         // 每次鼠标按下时更改笑脸的样式
         statusImg.style.backgroundImage = "url('images/ohh.png')";
         // 鼠标左键
@@ -277,13 +390,20 @@ function play() {
 
         // 鼠标右键
         if (e.button === 2) {
-
+            rightClick(e.target);
         }
     };
     contentDom.firstChild.onmouseup = () => {
         // 每次鼠标松开后更改回笑脸的样式
-        if (!isDead) { // 如果游戏失败
-            statusImg.style.backgroundImage = "url('images/smile.png')";
+        statusImg.style.backgroundImage = "url('images/smile.png')";
+        if (isDead) { 
+            // 游戏结束后不能改回smile，就用dead
+            statusImg.style.backgroundImage = "url('images/dead.png')";
+            return;
+        }
+        if (isWin) {
+            // 游戏胜利后不能改回smile，就用win
+            statusImg.style.backgroundImage = "url('images/win.png')";
         }
     };
 }
@@ -297,3 +417,10 @@ function main() {
 }
 
 main();
+
+// TODO: 1. 剩余雷数的显示
+// TODO: 2. 第一次点击不会选中雷的逻辑
+// TODO: 3. 满屏雷区
+// TODO: 4. 自定义雷区
+// TODO: 5. 作弊模式
+// TODO: 6. 游戏排行榜

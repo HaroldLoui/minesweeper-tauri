@@ -152,14 +152,25 @@ td>div.eight {
 }
 
 td>div.mine {
-    opacity: 0.2;
+    opacity: 0;
     background: url("../images/mine.png") center/cover no-repeat;
 }
 
+td>div.mine-death {
+    opacity: 1;
+    background: url("../images/mine-death.png") center/cover no-repeat;
+}
+
 td>div.flag {
+    opacity: 1;
     background: url("../images/flag.png") center/cover no-repeat;
 }
 
 td>div.question {
+    opacity: 1;
     background: url("../images/question.png") center/cover no-repeat;
+}
+
+td>div.misflagged {
+    background: url("../images/misflagged.png") center/cover no-repeat;
 }

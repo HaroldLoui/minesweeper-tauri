@@ -15,6 +15,7 @@ const unlisten = async () => {
         level = event.payload;
         console.log(event.payload);
         init();
+        play();
     });
 };
 unlisten();
