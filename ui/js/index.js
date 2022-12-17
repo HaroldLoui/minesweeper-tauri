@@ -23,6 +23,8 @@ var isWin = false;
 var openNum = 0;
 // 雷的数量
 var mineNum = level.mines;
+// 可作弊次数
+var cheats = level.cheat;
 
 // 初始化函数
 function init() {
@@ -30,6 +32,7 @@ function init() {
     isDead = false;
     isWin = false;
     mineNum = level.mines;
+    cheats = level.cheat;
     clearTimeInterval();
     // startTime();
     resetWidth();
@@ -403,6 +406,34 @@ function rightClick(cell) {
     }
 }
 
+/**
+ * 作弊模式
+ */
+function midClick(cell) {
+    // 作弊次数用光则无法在进行作弊
+    // console.log(cheats);
+    if (cheats <= 0) {
+        return;
+    }
+    var cellData = getDataByCell(cell);
+    if (cellData === null || cellData === undefined) {
+        return;
+    }
+    if (!cellData.isOpen && cellData.rightStatus === 0) {
+        if (cellData.type === "number") {
+            // 是数字直接进行搜索逻辑
+            search(cell, cellData);
+        } else {
+            // 是雷则插上旗子
+            cellData.rightStatus = 1;
+            cell.classList.add("flag");
+            mineNum -= 1;
+            drawMineDigit(mineNum);
+        }
+        cheats -= 1;
+    }
+}
+
 // 游玩逻辑事件
 function bindPlayEvent() {
     isDead = false;
@@ -423,7 +454,7 @@ function bindPlayEvent() {
 
         // 鼠标中键
         if (e.button === 1) {
-            // midClick();
+            midClick(e.target);
         }
 
         // 鼠标右键
