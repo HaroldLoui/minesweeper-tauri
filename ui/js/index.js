@@ -246,8 +246,8 @@ const NUMBER_STR = [ "zero", "one", "two", "three", "four", "five", "six", "seve
 function leftClick(cell) {
     // console.log(cell.dataset.id);
     var cellData = getDataByCell(cell);
-    // 被标了旗子或者问号则不能点击当前格子
-    if (cellData.rightStatus > 0) {
+    // 被标了旗子/问号或者已经打开则不能点击当前格子
+    if (cellData.rightStatus > 0 || cellData.isOpen) {
         return;
     }
     // 如果是雷，游戏失败
@@ -276,7 +276,10 @@ function search(cell, cellData) {
     if (cellData.rightStatus === 0) {
         cell.classList.add(NUMBER_STR[n]);
         cell.parentNode.style.border = "none";
+        // 标记格子被搜索
         cellData.isSearch = true;
+        // 标记格子被打开
+        cellData.isOpen = true;
         openNum++;
         if (openNum === level.row * level.col - level.mines) {
             gameWin();
