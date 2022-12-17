@@ -21,15 +21,19 @@ var isDead = false;
 var isWin = false;
 // 当前被打开的格子数量，如果等于总格数-雷数量则游戏胜利
 var openNum = 0;
+// 雷的数量
+var mineNum = level.mines;
 
 // 初始化函数
 function init() {
     openNum = 0;
     isDead = false;
     isWin = false;
+    mineNum = level.mines;
     clearTimeInterval();
     // startTime();
     resetWidth();
+    drawMineDigit(mineNum);
     drawTable();
 }
 
@@ -152,7 +156,7 @@ function startTime() {
         if (curTime > 999) {
             clearInterval(timeId);
         } else {
-            drawDigit(curTime, 1);
+            drawTimeDigit(curTime);
         }
     }, 1000);
 }
@@ -169,32 +173,49 @@ const DIGIT_IMAGE_URLS = [
     "url('images/digit7.png')",
     "url('images/digit8.png')",
     "url('images/digit9.png')",
+    "url('images/digit-.png')",
 ];
 
 /**
- * 绘制游戏状态区域的数字信息
+ * 绘制游戏时间
  * @param {Number} n 绘制的数字
- * @param {Number} type 绘制的类型 0-剩余雷的数量 1-花费的时间
  */
-function drawDigit(n, type) {
+function drawTimeDigit(n) {
     // 百位数
     var b = parseInt(n / 100);
     // 十位数
     var s = parseInt((n / 10) % 10);
     // 个位数
     var g = n % 10;
-    // 根据类型绘制不同的区域
-    if (type === 0) {
-        var children = mineNumDom.children;
-        children[0].style.backgroundImage = DIGIT_IMAGE_URLS[b];
-        children[1].style.backgroundImage = DIGIT_IMAGE_URLS[s];
-        children[2].style.backgroundImage = DIGIT_IMAGE_URLS[g];
+    var children = timeNumDom.children;
+    children[0].style.backgroundImage = DIGIT_IMAGE_URLS[b];
+    children[1].style.backgroundImage = DIGIT_IMAGE_URLS[s];
+    children[2].style.backgroundImage = DIGIT_IMAGE_URLS[g];
+}
+
+/**
+ * 绘制游戏时间
+ * @param {Number} n 绘制的数字
+ */
+function drawMineDigit(n) {
+    var children = mineNumDom.children;
+    // 百位数
+    var b;
+    // 十位数
+    var s;
+    // 个位数
+    var g;
+    if (n < 0) {
+        n = Math.abs(n);
+        children[0].style.backgroundImage = DIGIT_IMAGE_URLS[10];
     } else {
-        var children = timeNumDom.children;
+        b = parseInt(n / 100);
         children[0].style.backgroundImage = DIGIT_IMAGE_URLS[b];
-        children[1].style.backgroundImage = DIGIT_IMAGE_URLS[s];
-        children[2].style.backgroundImage = DIGIT_IMAGE_URLS[g];
     }
+    s = parseInt((n / 10) % 10);
+    g = n % 10;
+    children[1].style.backgroundImage = DIGIT_IMAGE_URLS[s];
+    children[2].style.backgroundImage = DIGIT_IMAGE_URLS[g];
 }
 
 // 绑定事件
@@ -204,7 +225,7 @@ function bindEvent() {
     // 绑定笑脸点击事件
     bindStatusEvent();
     // 绑定游玩逻辑事件
-    play();
+    bindPlayEvent();
 }
 
 // 取消右键菜单
@@ -224,7 +245,7 @@ function bindStatusEvent() {
         statusDom.style.borderColor = "#808080 #fff #fff #808080";
         statusImg.style.backgroundImage = "url('images/smile.png')";
         init();
-        play();
+        bindPlayEvent();
     };
     statusBtn.onmouseup = () => {
         // 点击的时候更改边框样式
@@ -235,6 +256,9 @@ function bindStatusEvent() {
 // 获取格子上的数据信息
 function getDataByCell(cell) {
     var index = cell.dataset.id;
+    if (index === undefined || index === null) {
+        return null;
+    }
     var x = Math.floor(index / level.col);
     var y = index % level.col;
     return tableData[x][y];
@@ -246,6 +270,9 @@ const NUMBER_STR = [ "zero", "one", "two", "three", "four", "five", "six", "seve
 function leftClick(cell) {
     // console.log(cell.dataset.id);
     var cellData = getDataByCell(cell);
+    if (cellData === null || cellData === undefined) {
+        return;
+    }
     // 被标了旗子/问号或者已经打开则不能点击当前格子
     if (cellData.rightStatus > 0 || cellData.isOpen) {
         return;
@@ -341,6 +368,7 @@ function gameOver(cell) {
         if (obj.type === "number") {
             dom.classList.remove("flag");
             dom.classList.add("misflagged");
+            dom.parentNode.style.border = "none";
         }
     });
 }
@@ -348,6 +376,9 @@ function gameOver(cell) {
 // 右键点击事件
 function rightClick(cell) {
     var cellData = getDataByCell(cell);
+    if (cellData === null || cellData === undefined) {
+        return;
+    }
     cellData.rightStatus = (cellData.rightStatus + 1) % 3;
     switch (cellData.rightStatus) {
         // 0 空
@@ -357,19 +388,23 @@ function rightClick(cell) {
         // 1 旗子
         case 1:
             cell.classList.add("flag");
+            mineNum -= 1;
+            drawMineDigit(mineNum);
             break;
         // 2 问号
         case 2:
             cell.classList.remove("flag");
             cell.classList.add("question");
+            mineNum += 1;
+            drawMineDigit(mineNum);
             break;
         default:
             break;
     }
 }
 
-// 游玩逻辑
-function play() {
+// 游玩逻辑事件
+function bindPlayEvent() {
     isDead = false;
     isWin = false;
     // console.log(contentDom.firstChild);
