@@ -8,217 +8,119 @@ const contentDom = document.querySelector(".content");
 // 笑脸按钮元素
 const statusBtn = document.querySelector("#statusBtn");
 const statusDom = document.querySelector(".status");
-// 时间状态元素
-const timeNumDom = document.querySelector(".timeNum");
-// 剩余雷数元素
-const mineNumDom = document.querySelector(".mineNum");
-// 雷区元素
-const mineAreaDom = document.querySelector(".content");
 
-// 游戏是否失败
-var isDead = false;
+const NUMBER_STR = [ "zero", "one", "two", "three", "four", "five", "six", "seven", "eight" ];
+
+// ============== global variables ========
+// 游戏是否初始化
+var isInit = false;
 // 游戏是否胜利
 var isWin = false;
-// 当前被打开的格子数量，如果等于总格数-雷数量则游戏胜利
-var openNum = 0;
-// 雷的数量
-var mineNum = level.mines;
-// 可作弊次数
-var cheats = level.cheat;
+//游戏是否失败
+var isDead = false;
+// 存储雷区数字 9 代表是雷
+var mineArea = [];
+// 打开格子的数量
+var openBlockNum = 0;
+// 插旗数
+var flagNum = 0;
+// 当前时间
+var curTime = 0;
+var timeId = null;
+// ============== global variables ========
 
-// 初始化函数
-function init() {
-    openNum = 0;
-    isDead = false;
-    isWin = false;
-    mineNum = level.mines;
-    cheats = level.cheat;
-    clearTimeInterval();
-    // startTime();
-    resetWidth();
-    drawMineDigit(mineNum);
-    drawTable();
+function initData() {
+    initVariables();
+    // 初始化游戏页面宽度
+    initWidth();
+    // 创建雷区格子
+    createMineBlocks();
+    // 更新雷区格子数量
+    updateLaveMineNum(flagNum);
+    // 重置时间
+    resetTime();
+    // 清除时间id
+    clearTime();
 }
 
 /**
- * 根据游戏绘制不同的宽度
+ * 初始化全局变量
  */
-function resetWidth() {
-    const width = level.col * 30 + 4;
+function initVariables() {
+    isInit = false;
+    isWin = false;
+    isDead = false;
+    mineArea = [];
+    openBlockNum = 0;
+    flagNum = 0;
+    curTime = 0;
+}
+
+/**
+ * 初始化游戏页面宽度
+ */
+function initWidth() {
+    // 根据游戏绘制不同的宽度
+    const width = LEVEL.col * 25;
     headerDom.style.width = width + "px";
     contentDom.style.width = width + "px";
     containerDom.style.width = width + 20 + "px";
 }
 
-// 表格每个格子的信息
-var tableData = [];
-// 绘制表格
-function drawTable() {
-    tableData = [];
+/**
+ * 创建页面格子并初始化雷区数字数组
+ */
+function createMineBlocks() {
+    // 创建雷区表格
     var table = document.createElement("table");
-    var array = createMines();
-    for (var i = 0; i < level.row; i++) {
+    for (var i = 0; i < LEVEL.row; i++) {
+        // 创建雷区的每一行
         var tr = document.createElement("tr");
-        tableData[i] = [];
-        for (var j = 0; j < level.col; j++) {
-            var isMine = array[i][j] === 9;
+        // 初始化雷区数组的每行
+        mineArea[i] = [];
+        for (var j = 0; j < LEVEL.col; j++) {
+            var id = i * LEVEL.col + j;
+            // 创建雷区每行的每一列
             var td = document.createElement("td");
-            var div = document.createElement("div");
-            div.dataset.id = i * level.col + j;
-            if (isMine) {
-                div.classList.add("mine");
-            }
-            td.appendChild(div);
-            var obj = {
-                type: isMine ? "mine" : "number", // 当前格子的类型
-                value: array[i][j], // 当前格子的值
-                isOpen: false,      // 当前格子有没有被打开
-                rightStatus: 0,     // 当前格子的右键状态 0-无，1-旗帜，2-问号
-                isSearch: false,    // 当前格子有没有被搜索过
-                cell: div,          // 格子信息
-            };
-            tableData[i][j] = obj;
+            td.dataset.id = id;
+            td.id = "td" + id;
             tr.appendChild(td);
+            // 初始化雷区数组每行的每列
+            // mineArea[i][j] = 0;
+            mineArea[i][j] = {
+                value: 0, // 值
+                isVisit: false, // 是否被访问过
+                isFlag: 0, // 0-空 1-旗子 2-问号
+            };
         }
         table.appendChild(tr);
     }
-    // 防止重复添加表格
-    mineAreaDom.innerHTML = "";
-    mineAreaDom.appendChild(table);
-}
-
-// 生成雷区
-function createMines() {
-    // 使用洗牌算法生成雷区的一维数组
-    var array = new Array(level.row * level.col);
-    array.fill(0);
-    array.fill(9, 0, level.mines);
-    array = shuffle(array);
-    // 将雷区一维数组转成二维数组
-    var mineArray = [];
-    for (var i = 0; i < level.row; i++) {
-        var cols = [];
-        for (var j = 0; j < level.col; j++) {
-            var index = i * level.col + j;
-            cols[j] = array[index] === 9 ? 9 : 0;
-        }
-        mineArray[i] = cols;
-    }
-    // 生成每个雷周围的数字
-    for (var i = 0; i < level.row; i++) {
-        for (var j = 0; j < level.col; j++) {
-            if (mineArray[i][j] === 9) {
-                // 如果是雷，则将周围八个非雷的格子数字+1
-                for (var x = i - 1; x <= i + 1; x++) {
-                    for (var y = j - 1; y <= j + 1; y++) {
-                        if (inArea(x, y) && mineArray[x][y] !== 9) {
-                            mineArray[x][y] += 1;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return mineArray;
-}
-
-// 洗牌算法
-function shuffle(arr){
-    var result = [],
-        random;
-    while(arr.length > 0){
-        random = Math.floor(Math.random() * arr.length);
-        result.push(arr[random])
-        arr.splice(random, 1)
-    }
-    return result;
-}
-
-// 判断坐标是否合格
-function inArea(x, y) {
-    return x >= 0 && x < level.row && 
-           y >= 0 && y < level.col;
-}
-
-// 时间相关
-var timeId = null;
-var curTime = 0;
-
-// 清除时间id
-function clearTimeInterval() {
-    curTime = 0;
-    if (timeId !== null) {
-        clearInterval(timeId);
-    }
-}
-
-// 启动时间
-function startTime() {
-    timeId = setInterval(() => {
-        curTime++;
-        if (curTime > 999) {
-            clearInterval(timeId);
-        } else {
-            drawTimeDigit(curTime);
-        }
-    }, 1000);
-}
-
-// 数字图片路径
-const DIGIT_IMAGE_URLS = [
-    "url('images/digit0.png')",
-    "url('images/digit1.png')",
-    "url('images/digit2.png')",
-    "url('images/digit3.png')",
-    "url('images/digit4.png')",
-    "url('images/digit5.png')",
-    "url('images/digit6.png')",
-    "url('images/digit7.png')",
-    "url('images/digit8.png')",
-    "url('images/digit9.png')",
-    "url('images/digit-.png')",
-];
-
-/**
- * 绘制游戏时间
- * @param {Number} n 绘制的数字
- */
-function drawTimeDigit(n) {
-    // 百位数
-    var b = parseInt(n / 100);
-    // 十位数
-    var s = parseInt((n / 10) % 10);
-    // 个位数
-    var g = n % 10;
-    var children = timeNumDom.children;
-    children[0].style.backgroundImage = DIGIT_IMAGE_URLS[b];
-    children[1].style.backgroundImage = DIGIT_IMAGE_URLS[s];
-    children[2].style.backgroundImage = DIGIT_IMAGE_URLS[g];
+    contentDom.innerHTML = '';
+    contentDom.appendChild(table);
 }
 
 /**
- * 绘制游戏时间
- * @param {Number} n 绘制的数字
+ * 根据第一次选择的位置来生成雷区，以确保第一次不会踩中雷
+ * @param {Number} pos 第一次的选择位置
  */
-function drawMineDigit(n) {
-    var children = mineNumDom.children;
-    // 百位数
-    var b;
-    // 十位数
-    var s;
-    // 个位数
-    var g;
-    if (n < 0) {
-        n = Math.abs(n);
-        children[0].style.backgroundImage = DIGIT_IMAGE_URLS[10];
-    } else {
-        b = parseInt(n / 100);
-        children[0].style.backgroundImage = DIGIT_IMAGE_URLS[b];
+function createMineArea(pos) {
+    // 一维雷区数组
+    var mineArray = new Array(LEVEL.row * LEVEL.col);
+    for (var i = 0; i < mineArray.length; i++) {
+        mineArray[i] = [];
+        mineArray[i][0] = i;
+        mineArray[i][1] = 0;
     }
-    s = parseInt((n / 10) % 10);
-    g = n % 10;
-    children[1].style.backgroundImage = DIGIT_IMAGE_URLS[s];
-    children[2].style.backgroundImage = DIGIT_IMAGE_URLS[g];
+    // 将选择的位置放到最后
+    _swap(mineArray, pos, mineArray.length - 1);
+    // 通过shuffle算法确保雷被放到每个位置的概率是均匀的
+    for (var i = 0; i < LEVEL.mines; i++) {
+        mineArray[i][1] = 9;
+    }
+    _shuffle(mineArray);
+    // 一维雷区数组生成二维雷区数组
+    _generateNumbers(mineArray, pos);
+    // console.log(mineArea);
 }
 
 // 绑定事件
@@ -227,7 +129,7 @@ function bindEvent() {
     cancelContextMenu();
     // 绑定笑脸点击事件
     bindStatusEvent();
-    // 绑定游玩逻辑事件
+    // 绑定雷区点击事件
     bindPlayEvent();
 }
 
@@ -242,13 +144,11 @@ function cancelContextMenu() {
  * 笑脸点击事件
  */
 function bindStatusEvent() {
-    var statusImg = statusBtn.children[0];
     statusBtn.onmousedown = () => {
+        _changeSmile(0);
         // 鼠标点击的时候更改边框样式
         statusDom.style.borderColor = "#808080 #fff #fff #808080";
-        statusImg.style.backgroundImage = "url('images/smile.png')";
-        init();
-        bindPlayEvent();
+        initData();
     };
     statusBtn.onmouseup = () => {
         // 点击的时候更改边框样式
@@ -256,231 +156,234 @@ function bindStatusEvent() {
     };
 }
 
-// 获取格子上的数据信息
-function getDataByCell(cell) {
-    var index = cell.dataset.id;
-    if (index === undefined || index === null) {
-        return null;
-    }
-    var x = Math.floor(index / level.col);
-    var y = index % level.col;
-    return tableData[x][y];
+/**
+ * 游戏游玩点击的逻辑事件
+ */
+function bindPlayEvent() {
+    // 鼠标按下
+    contentDom.onmousedown = (e) => {
+        // 游戏成功或者失败都不能继续进行点击
+        if (isWin || isDead) {
+            return;
+        }
+        // 每次点击的时候切换下笑脸的图片为ohh
+        _changeSmile(1);
+        // 确保第一次点击不会踩到雷
+        if (!isInit) {
+            isInit = true;
+            // 设置雷区
+            createMineArea(e.target.dataset.id);
+            // 启动时间
+            startTime();
+        }
+        switch (e.button) {
+            case 0: // 左键
+                leftClick(e.target);
+                break;
+            case 1: // 中键
+                console.log(1);
+                break;
+            case 2: // 右键
+                rightClick(e.target);
+                break;
+            default: break;
+        }
+    };
+    // 鼠标松开
+    contentDom.onmouseup = () => {
+        // 游戏胜利则显示胜利的图片
+        if (isWin) {
+            _changeSmile(2);
+            return;
+        }
+        // 游戏失败则显示失败的图片
+        if (isDead) {
+            _changeSmile(3);
+            return;
+        }
+        // 从ohh切回笑脸
+        _changeSmile(0);
+    };
 }
 
-const NUMBER_STR = [ "zero", "one", "two", "three", "four", "five", "six", "seven", "eight" ];
-
-// 左键点击事件
+/**
+ * 左键点击事件
+ * @param {Element} cell 
+ */
 function leftClick(cell) {
-    // console.log(cell.dataset.id);
-    var cellData = getDataByCell(cell);
-    if (cellData === null || cellData === undefined) {
+    var id = cell.dataset.id;
+    const {x, y} = _1to2(id);
+    // 已经被打开或者被标记了旗子和问号的格子不能被点击
+    if (mineArea[x][y].isVisit || mineArea[x][y].isFlag > 0) {
         return;
     }
-    // 被标了旗子/问号或者已经打开则不能点击当前格子
-    if (cellData.rightStatus > 0 || cellData.isOpen) {
-        return;
-    }
-    // 如果是雷，游戏失败
-    if (cellData.type === "mine") {
-        // 游戏结束
+    // 踩到雷了
+    if (mineArea[x][y].value === 9) {
         gameOver(cell);
         return;
-    }
-    // 如果是数字类型
-    if (cellData.type === "number") {
-        // 搜索逻辑
-        search(cell, cellData);
-    }
+    } 
+    // 0-8则打开格子
+    openBlock(x, y);
 }
 
-// 八方向偏移量
-const d = [
-    [-1, -1], [ 0, -1], [ 1, -1], [-1,  0], 
-    [ 1,  0], [-1,  1], [ 0,  1], [ 1,  1]
-];
-// 搜索函数
-function search(cell, cellData) {
-    // 如果是数字1-7并且没有标记旗子和问号则直接打开并返回
-    var n = cellData.value;
-    // 标记了旗子和问号不能打开
-    if (cellData.rightStatus === 0) {
-        cell.classList.add(NUMBER_STR[n]);
-        cell.parentNode.style.border = "none";
-        // 标记格子被搜索
-        cellData.isSearch = true;
-        // 标记格子被打开
-        cellData.isOpen = true;
-        openNum++;
-        if (openNum === level.row * level.col - level.mines) {
-            gameWin();
-        }
-    }
-    if (n !== 0) {
+/**
+ * 打开当前格子
+ * @param {Number} x 
+ * @param {Number} y 
+ */
+function openBlock(x, y) {
+    const value = mineArea[x][y].value;
+    if (value === 9 || mineArea[x][y].isVisit) {
         return;
     }
-    // 是0执行搜索逻辑
-    var curX = Math.floor(cell.dataset.id / level.col);
-    var curY = cell.dataset.id % level.col;
-    for (var i = 0; i < 8; i++) {
-        var newX = curX + d[i][0];
-        var newY = curY + d[i][1];
-        if (inArea(newX, newY) && 
-            tableData[newX][newY].type === "number" && 
-            tableData[newX][newY].isSearch === false) {
-            var newCellData = tableData[newX][newY];
-            var newCell = newCellData.cell;
-            search(newCell, newCellData);
-        }
-    }
-}
-
-function gameWin() {
-    console.log("恭喜您，游戏胜利！！！");
-    isWin = true;
-    // 笑脸改成胜利
-    var statusImg = statusBtn.children[0];
-    statusImg.style.backgroundImage = "url('images/win.png')";
-}
-
-// 游戏结束
-function gameOver(cell) {
-    // 全局游戏状态
-    isDead = true;
-    // 笑脸改成失败
-    var statusImg = statusBtn.children[0];
-    statusImg.style.backgroundImage = "url('images/dead.png')";
-    // 改变当前格子背景色
-    cell.parentNode.style.border = "none";
-    cell.parentNode.style.backgroundColor = "#FF0000";
-    cell.classList.remove("mine");
-    cell.classList.add("mine-death");
-    // 显示所有雷
-    var allMineDiv = document.querySelectorAll(".mine");
-    allMineDiv.forEach((dom) => {
-        dom.style.opacity = 1;
-        dom.parentNode.style.border = "none";
-    });
-    // 找到所有插错旗子的格子
-    var allFlagDiv = document.querySelectorAll(".flag");
-    allFlagDiv.forEach((dom) => {
-        var id = dom.dataset.id;
-        var x = Math.floor(id / level.col);
-        var y = id % level.col;
-        var obj = tableData[x][y];
-        // 旗子插在了数字上
-        if (obj.type === "number") {
-            dom.classList.remove("flag");
-            dom.classList.add("misflagged");
-            dom.parentNode.style.border = "none";
-        }
-    });
-}
-
-// 右键点击事件
-function rightClick(cell) {
-    var cellData = getDataByCell(cell);
-    if (cellData === null || cellData === undefined) {
+    mineArea[x][y].isVisit = true;
+    var id = x * LEVEL.col + y;
+    var dom = document.querySelector("#td" + id);
+    _removeBorder(dom);
+    dom.classList.add(NUMBER_STR[value]);
+    // 检查是否胜利
+    openBlockNum += 1;
+    if (openBlockNum === LEVEL.row * LEVEL.col - LEVEL.mines) {
+        gameWin();
         return;
     }
-    cellData.rightStatus = (cellData.rightStatus + 1) % 3;
-    switch (cellData.rightStatus) {
-        // 0 空
-        case 0:
-            cell.classList.remove("question");
-            break;
-        // 1 旗子
-        case 1:
-            cell.classList.add("flag");
-            mineNum -= 1;
-            drawMineDigit(mineNum);
-            break;
-        // 2 问号
-        case 2:
-            cell.classList.remove("flag");
-            cell.classList.add("question");
-            mineNum += 1;
-            drawMineDigit(mineNum);
-            break;
-        default:
-            break;
+    // 如果是空白格子则进行递归打开操作
+    if (value === 0) {
+        for (var i = 0; i < 8; i++) {
+            var x1 = x + D[i][0];
+            var y1 = y + D[i][1];
+            if (_inArea(x1, y1) && mineArea[x1][y1].value !== 9 &&
+                !mineArea[x1][y1].isVisit && mineArea[x1][y1].isFlag === 0) {
+                openBlock(x1, y1);
+            }
+        }
     }
 }
 
 /**
- * 作弊模式
+ * 游戏胜利逻辑
  */
-function midClick(cell) {
-    // 作弊次数用光则无法在进行作弊
-    // console.log(cheats);
-    if (cheats <= 0) {
-        return;
-    }
-    var cellData = getDataByCell(cell);
-    if (cellData === null || cellData === undefined) {
-        return;
-    }
-    if (!cellData.isOpen && cellData.rightStatus === 0) {
-        if (cellData.type === "number") {
-            // 是数字直接进行搜索逻辑
-            search(cell, cellData);
-        } else {
-            // 是雷则插上旗子
-            cellData.rightStatus = 1;
-            cell.classList.add("flag");
-            mineNum -= 1;
-            drawMineDigit(mineNum);
+function gameWin() {
+    // 设置全局属性
+    isWin = true;
+    // 改笑脸
+    _changeSmile(2);
+    // 清除时间
+    clearTime();
+    // TODO: 排行榜
+    console.log("You win");
+}
+
+/**
+ * 游戏结束逻辑
+ * @param {document} cell
+ */
+function gameOver(cell) {
+    // 设置全局属性
+    isDead = true;
+    // 改笑脸
+    _changeSmile(3);
+    // 清除时间
+    clearTime();
+    // 找到所有为雷并且没有被右键进行标记过的格子标记出来
+    for (var i = 0; i < LEVEL.row; i++) {
+        for (var j = 0; j < LEVEL.col; j++) {
+            if (mineArea[i][j].value === 9 && 
+                mineArea[i][j].isFlag === 0) {
+                var id = i * LEVEL.col + j;
+                var dom = document.querySelector("#td" + id);
+                dom.classList.add("mine");
+                _removeBorder(dom);
+            }
         }
-        cheats -= 1;
+    }
+    // 选中的格子颜色为红色
+    cell.classList.remove("mine");
+    cell.classList.add("mine-death");
+    // 找到所有插错旗子的格子
+    var flagBlocks = document.querySelectorAll(".flag");
+    flagBlocks.forEach((dom) => {
+        const {x, y} = _1to2(dom.dataset.id);
+        // 插错旗了
+        if (mineArea[x][y].value !== 9) {
+            dom.classList.remove("flag");
+            dom.classList.add("misflagged");
+        }
+    });
+}
+
+/**
+ * 右键点击事件
+ * @param {Element} cell 
+ */
+function rightClick(cell) {
+    var id = cell.dataset.id;
+    const {x, y} = _1to2(id);
+    // 已经被打开的格子不能被右键点击
+    if (mineArea[x][y].isVisit) {
+        return;
+    }
+    // 更新当前格子右键状态;
+    mineArea[x][y].isFlag = (mineArea[x][y].isFlag + 1) % 3;
+    switch (mineArea[x][y].isFlag) {
+        case 0: // 空
+            cell.classList.remove("question");
+            break;
+        case 1: // 旗子
+            cell.classList.add("flag");
+            flagNum++;
+            break;
+        case 2: // 问号
+            cell.classList.remove("flag");
+            cell.classList.add("question");
+            flagNum--;
+            break;
+        default: break;
+    }
+    // 更新剩余雷的数量
+    updateLaveMineNum(flagNum);
+}
+
+/**
+ * 根据插旗的数量更新剩余雷的数量
+ * @param {Number} flagNum 插旗的数量
+ */
+function updateLaveMineNum(flagNum) {
+    var laveNum = LEVEL.mines - flagNum;
+    _drawLaveMines(laveNum);
+}
+
+/**
+ * 重置时间
+ */
+function resetTime() {
+    curTime = 0;
+    _drawCurTime(curTime);
+}
+
+/**
+ * 清除时间id
+ */
+function clearTime() {
+    if (timeId !== null) {
+        clearInterval(timeId);
     }
 }
 
-// 游玩逻辑事件
-function bindPlayEvent() {
-    isDead = false;
-    isWin = false;
-    // console.log(contentDom.firstChild);
-    var statusImg = statusBtn.children[0];
-    contentDom.firstChild.onmousedown = (e) => {
-        // 游戏胜利或者结束的话点击事件都不能生效
-        if (isDead || isWin) {
-            return;
-        }
-        // 每次鼠标按下时更改笑脸的样式
-        statusImg.style.backgroundImage = "url('images/ohh.png')";
-        // 鼠标左键
-        if (e.button === 0) {
-            leftClick(e.target);
-        }
-
-        // 鼠标中键
-        if (e.button === 1) {
-            midClick(e.target);
-        }
-
-        // 鼠标右键
-        if (e.button === 2) {
-            rightClick(e.target);
-        }
-    };
-    contentDom.firstChild.onmouseup = () => {
-        // 每次鼠标松开后更改回笑脸的样式
-        statusImg.style.backgroundImage = "url('images/smile.png')";
-        if (isDead) { 
-            // 游戏结束后不能改回smile，就用dead
-            statusImg.style.backgroundImage = "url('images/dead.png')";
-            return;
-        }
-        if (isWin) {
-            // 游戏胜利后不能改回smile，就用win
-            statusImg.style.backgroundImage = "url('images/win.png')";
-        }
-    };
+/**
+ * 启动时间
+ */
+function startTime() {
+    timeId = setInterval(() => {
+        curTime++;
+        _drawCurTime(curTime);
+    }, 1000);
 }
 
 // 主函数
 function main() {
-    // 初始化
-    init();
+    // 初始化数据
+    initData();
     // 绑定事件
     bindEvent();
 }

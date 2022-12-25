@@ -2,21 +2,18 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #f7f7f0;
+    background-color: #F7F7F0;
 }
 
 .container {
-    /* width: 270px; */
     margin: 10px auto;
     padding-top: 5px;
     padding-bottom: 5px;
     background-color: #ccc;
     border-radius: 5px;
-    cursor: default;
 }
 
 .header {
-    /* width: 250px; */
     height: 50px;
     margin: 5px auto;
     background-color: #ccc;
@@ -37,10 +34,43 @@
 .digit-img {
     width: 20px;
     height: 80%;
-    background-image: url("../images/digit0.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
+}
+
+.digit0 {
+    background-image: url("../images/digit0.png");
+}
+.digit1 {
+    background-image: url("../images/digit1.png");
+}
+.digit2 {
+    background-image: url("../images/digit2.png");
+}
+.digit3 {
+    background-image: url("../images/digit3.png");
+}
+.digit4 {
+    background-image: url("../images/digit4.png");
+}
+.digit5 {
+    background-image: url("../images/digit5.png");
+}
+.digit6 {
+    background-image: url("../images/digit6.png");
+}
+.digit7 {
+    background-image: url("../images/digit7.png");
+}
+.digit8 {
+    background-image: url("../images/digit8.png");
+}
+.digit9 {
+    background-image: url("../images/digit9.png");
+}
+.digit- {
+    background-image: url("../images/digit-.png");
 }
 
 .mineNum {
@@ -51,17 +81,17 @@
 
 .status {
     background-color: #ccc;
-    width: 30px;
+    width: 30px; 
     height: 30px;
     border: 3px solid;
-    border-color: #fff #808080 #808080 #fff;
+    border-color:#fff #808080 #808080 #fff;
 }
 
 .status button {
     width: 30px;
     height: 25px;
     margin: 0 auto;
-    background-color: #ccc;
+    background-color: #ccc; 
     border: none;
 }
 
@@ -73,7 +103,7 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    background-color: #ccc;
+    background-color: #ccc; 
 }
 
 .timeNum {
@@ -90,87 +120,79 @@
     border-color: #a1a1a1 #fff #fff #a1a1a1;
 }
 
-table {
-    margin: 0 auto;
+table{
     /* 格子之间的缝隙 */
+    margin: 0 auto;
     border-spacing: 1px;
-    background: #ccc;
+    background: #808080;
 }
 
 td {
-    padding: 0;
-    width: 30px;
-    height: 30px;
+    /* padding: 0; */
+    width: 25px;
+    height: 25px;
     background: #ccc;
-    border: 2px solid;
+    border: 3px solid transparent;
     border-color: #fff #a1a1a1 #a1a1a1 #fff;
+    text-align: center;
 }
 
-td>div {
-    width: 100%;
-    height: 100%;
-    border: 2px solid;
-    border-color: #d9d9d9;
-    background: #ccc;
-}
-
-td>div.zero {
-    /* background: #d9d9d9; */
-    background: url("../images/empty.png") center/cover no-repeat;
-}
-
-td>div.one {
-    background: url("../images/open1.png") center/cover no-repeat;
-}
-
-td>div.two {
-    background: url("../images/open2.png") center/cover no-repeat;
-}
-
-td>div.three {
-    background: url("../images/open3.png") center/cover no-repeat;
-}
-
-td>div.four {
-    background: url("../images/open4.png") center/cover no-repeat;
-}
-
-td>div.five {
-    background: url("../images/open5.png") center/cover no-repeat;
-}
-
-td>div.six {
-    background: url("../images/open6.png") center/cover no-repeat;
-}
-
-td>div.seven {
-    background: url("../images/open7.png") center/cover no-repeat;
-}
-
-td>div.eight {
-    background: url("../images/open8.png") center/cover no-repeat;
-}
-
-td>div.mine {
-    opacity: 0;
+td.mine {
     background: url("../images/mine.png") center/cover no-repeat;
+    background-size: 100%;
 }
-
-td>div.mine-death {
-    opacity: 1;
+td.mine-death {
     background: url("../images/mine-death.png") center/cover no-repeat;
+    background-size: 100%;
 }
-
-td>div.flag {
-    opacity: 1;
+td.zero{
+    background: url("../images/empty.png") center/cover no-repeat;
+    background-size: 100%;
+}
+td.one{
+    background: url("../images/open1.png") center/cover no-repeat;
+    background-size: 100%;
+}
+td.two {
+    background: url("../images/open2.png") center/cover no-repeat;
+    background-size: 100%;
+}
+td.three {
+    background: url("../images/open3.png") center/cover no-repeat;
+    background-size: 100%;
+}
+td.four {
+    background: url("../images/open4.png") center/cover no-repeat;
+    background-size: 100%;
+}
+td.five {
+    background: url("../images/open5.png") center/cover no-repeat;
+    background-size: 100%;
+}
+td.six {
+    background: url("../images/open6.png") center/cover no-repeat;
+    background-size: 100%;
+}
+td.seven {
+    background: url("../images/open7.png") center/cover no-repeat;
+    background-size: 100%;
+}
+td.eight {
+    background: url("../images/open8.png") center/cover no-repeat;
+    background-size: 100%;
+}
+td.flag {
     background: url("../images/flag.png") center/cover no-repeat;
+    background-color: #ccc;
+    background-size: 100%;
 }
-
-td>div.question {
-    opacity: 1;
-    background: url("../images/question.png") center/cover no-repeat;
-}
-
-td>div.misflagged {
+td.misflagged {
     background: url("../images/misflagged.png") center/cover no-repeat;
+    background-color: #ccc;
+    background-size: 100%;
+}
+td.question {
+    background: url("../images/question.png") center/cover no-repeat;
+    background-color: #ccc;
+    background-size: 100%;
 }
