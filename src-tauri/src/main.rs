@@ -46,7 +46,7 @@ fn main() {
                 "simple" => {
                     println!("选择了初级模式");
                     let size = Size::Physical(PhysicalSize {
-                        width: 400 , height: 450,
+                        width: 380 , height: 450,
                     });
                     let info = GameInfo {
                         row: 10,
@@ -59,7 +59,7 @@ fn main() {
                 "medium" => {
                     println!("选择了中级模式");
                     let size = Size::Physical(PhysicalSize {
-                        width: 640 , height: 690,
+                        width: 600 , height: 665,
                     });
                     let info = GameInfo {
                         row: 16,
@@ -72,7 +72,7 @@ fn main() {
                 "hard" => {
                     println!("选择了高级模式");
                     let size = Size::Physical(PhysicalSize {
-                        width: 1300 , height: 690,
+                        width: 1100 , height: 665,
                     });
                     let info = GameInfo {
                         row: 16,

@@ -6,7 +6,7 @@
 }
 
 .container {
-    margin: 10px auto;
+    margin: 5px auto;
     padding-top: 5px;
     padding-bottom: 5px;
     background-color: #ccc;
@@ -129,8 +129,8 @@ table{
 
 td {
     /* padding: 0; */
-    width: 25px;
-    height: 25px;
+    width: 35px;
+    height: 35px;
     background: #ccc;
     border: 3px solid transparent;
     border-color: #fff #a1a1a1 #a1a1a1 #fff;

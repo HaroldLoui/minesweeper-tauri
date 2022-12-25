@@ -56,7 +56,7 @@
     "windows": [
       {
         "fullscreen": false,
-        "width": 400,
+        "width": 380,
         "height": 450,
         "resizable": false,
         "title": "minesweeper",

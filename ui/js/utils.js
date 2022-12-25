@@ -63,8 +63,8 @@ function _generateNumbers(array, pos) {
             }
         }
         // 为0的情况：
-        // 1、可能mineArea[x][y]已经被加过了，则mineArea[x][y]不能赋值为0
-        // 2、没有被加过，此时mineArea[x][y] = array[i][1] = 0，这时不需要赋值
+        // 1、可能mineArea[x][y].value已经被加过了，则mineArea[x][y].value不能赋值为0
+        // 2、没有被加过，此时mineArea[x][y].value = array[i][1] = 0，这时不需要赋值
     }
 }
 

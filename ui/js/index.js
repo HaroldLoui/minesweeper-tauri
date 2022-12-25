@@ -61,7 +61,7 @@ function initVariables() {
  */
 function initWidth() {
     // 根据游戏绘制不同的宽度
-    const width = LEVEL.col * 25;
+    const width = LEVEL.col * 35;
     headerDom.style.width = width + "px";
     contentDom.style.width = width + "px";
     containerDom.style.width = width + 20 + "px";
@@ -276,7 +276,7 @@ function gameWin() {
 
 /**
  * 游戏结束逻辑
- * @param {document} cell
+ * @param {Element} cell
  */
 function gameOver(cell) {
     // 设置全局属性
