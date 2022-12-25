@@ -27,6 +27,8 @@ var flagNum = 0;
 // 当前时间
 var curTime = 0;
 var timeId = null;
+//作弊次数
+var cheats = 0;
 // ============== global variables ========
 
 function initData() {
@@ -54,6 +56,7 @@ function initVariables() {
     openBlockNum = 0;
     flagNum = 0;
     curTime = 0;
+    cheats = LEVEL.cheat;
 }
 
 /**
@@ -181,7 +184,7 @@ function bindPlayEvent() {
                 leftClick(e.target);
                 break;
             case 1: // 中键
-                console.log(1);
+                middleClick(e.target);
                 break;
             case 2: // 右键
                 rightClick(e.target);
@@ -351,6 +354,29 @@ function rightClick(cell) {
 function updateLaveMineNum(flagNum) {
     var laveNum = LEVEL.mines - flagNum;
     _drawLaveMines(laveNum);
+}
+
+/**
+ * 中键点击事件
+ * @param {Element} cell 
+ */
+function middleClick(cell) {
+    const {x, y} = _1to2(cell.dataset.id);
+    const value = mineArea[x][y];
+    if (cheats <= 0 || mineArea[x][y].isVisit 
+        || mineArea[x][y].isFlag !== 0) {
+        return;
+    }
+    // 是雷则插上旗子，否则直接打开
+    if (value === 9) {
+        mineArea[x][y].isFlag = 1;
+        cell.classList.add("flag");
+        flagNum++;
+        updateLaveMineNum(flagNum);
+    } else {
+        openBlock(x, y);
+    }
+    cheats -= 1;
 }
 
 /**
