@@ -43,6 +43,8 @@ function initData() {
     resetTime();
     // 清除时间id
     clearTime();
+    // 重置笑脸图片
+    _changeSmile(0);
 }
 
 /**
@@ -362,9 +364,9 @@ function updateLaveMineNum(flagNum) {
  */
 function middleClick(cell) {
     const {x, y} = _1to2(cell.dataset.id);
-    const value = mineArea[x][y];
-    if (cheats <= 0 || mineArea[x][y].isVisit 
-        || mineArea[x][y].isFlag !== 0) {
+    const value = mineArea[x][y].value;
+    // 作弊次数用完、当前格子被打开、已经标上旗/问号都不能进行作弊
+    if (cheats <= 0 || mineArea[x][y].isVisit || mineArea[x][y].isFlag !== 0) {
         return;
     }
     // 是雷则插上旗子，否则直接打开

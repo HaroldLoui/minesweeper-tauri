@@ -72,7 +72,7 @@ fn main() {
                 "hard" => {
                     println!("选择了高级模式");
                     let size = Size::Physical(PhysicalSize {
-                        width: 1100 , height: 665,
+                        width: 1080 , height: 665,
                     });
                     let info = GameInfo {
                         row: 16,
