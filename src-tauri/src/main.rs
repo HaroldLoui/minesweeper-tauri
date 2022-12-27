@@ -12,6 +12,7 @@ use tauri::{
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
 struct GameInfo {
+    level: u32, // 当前等级
     row: u32,   // 行
     col: u32,   // 列
     mines: u32, // 雷数量
@@ -44,11 +45,11 @@ fn main() {
             let window = event.window();
             match event.menu_item_id() {
                 "simple" => {
-                    println!("选择了初级模式");
                     let size = Size::Physical(PhysicalSize {
                         width: 380 , height: 450,
                     });
                     let info = GameInfo {
+                        level: 1,
                         row: 10,
                         col: 10,
                         mines: 10,
@@ -57,11 +58,11 @@ fn main() {
                     choose_mode(window, size, info);
                 }
                 "medium" => {
-                    println!("选择了中级模式");
                     let size = Size::Physical(PhysicalSize {
                         width: 600 , height: 665,
                     });
                     let info = GameInfo {
+                        level: 2,
                         row: 16,
                         col: 16,
                         mines: 40,
@@ -70,11 +71,11 @@ fn main() {
                     choose_mode(window, size, info);
                 }
                 "hard" => {
-                    println!("选择了高级模式");
                     let size = Size::Physical(PhysicalSize {
                         width: 1080 , height: 665,
                     });
                     let info = GameInfo {
+                        level: 3,
                         row: 16,
                         col: 30,
                         mines: 99,
@@ -83,11 +84,11 @@ fn main() {
                     choose_mode(window, size, info);
                 }
                 "full_screen" => {
-                    println!("选择了满屏模式");
                     let size = Size::Physical(PhysicalSize {
                         width: 1200 , height: 690,
                     });
                     let info = GameInfo {
+                        level: 4,
                         row: 10,
                         col: 10,
                         mines: 10,
@@ -102,9 +103,17 @@ fn main() {
         .expect("error while running tauri application");
 }
 
+// TODO: 想法：创建多个页面，根据难度选择不同的页面
 fn choose_mode(window: &Window, size: Size, info: GameInfo) {
-    window.set_size(size).unwrap();
-    // window.center().unwrap();
+    if info.level == 4 {
+        // 当tauri.config.json的resizable设置为false时，此处在arch下不起作用
+        window.maximize().unwrap();
+        // println!("{:#?}", window.inner_size().unwrap());
+    } else {
+        window.unmaximize().unwrap();
+        window.set_size(size).unwrap();
+        window.center().unwrap();
+    }
+    window.center().unwrap();
     window.emit("choose-mode", info).unwrap();
 }
-

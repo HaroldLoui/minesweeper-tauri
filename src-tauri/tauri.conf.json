@@ -58,7 +58,7 @@
         "fullscreen": false,
         "width": 380,
         "height": 450,
-        "resizable": false,
+        "resizable": true,
         "title": "minesweeper",
         "center": true
       }

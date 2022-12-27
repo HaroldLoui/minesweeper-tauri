@@ -32,9 +32,10 @@ var cheats = 0;
 // ============== global variables ========
 
 function initData() {
-    initVariables();
     // 初始化游戏页面宽度
     initWidth();
+    // 初始化变量
+    initVariables();
     // 创建雷区格子
     createMineBlocks();
     // 更新雷区格子数量
@@ -58,7 +59,7 @@ function initVariables() {
     openBlockNum = 0;
     flagNum = 0;
     curTime = 0;
-    cheats = LEVEL.cheat;
+    cheats = GameInfo.cheat;
 }
 
 /**
@@ -66,7 +67,7 @@ function initVariables() {
  */
 function initWidth() {
     // 根据游戏绘制不同的宽度
-    const width = LEVEL.col * 35;
+    const width = GameInfo.col * 35;
     headerDom.style.width = width + "px";
     contentDom.style.width = width + "px";
     containerDom.style.width = width + 20 + "px";
@@ -78,13 +79,13 @@ function initWidth() {
 function createMineBlocks() {
     // 创建雷区表格
     var table = document.createElement("table");
-    for (var i = 0; i < LEVEL.row; i++) {
+    for (var i = 0; i < GameInfo.row; i++) {
         // 创建雷区的每一行
         var tr = document.createElement("tr");
         // 初始化雷区数组的每行
         mineArea[i] = [];
-        for (var j = 0; j < LEVEL.col; j++) {
-            var id = i * LEVEL.col + j;
+        for (var j = 0; j < GameInfo.col; j++) {
+            var id = i * GameInfo.col + j;
             // 创建雷区每行的每一列
             var td = document.createElement("td");
             td.dataset.id = id;
@@ -110,7 +111,7 @@ function createMineBlocks() {
  */
 function createMineArea(pos) {
     // 一维雷区数组
-    var mineArray = new Array(LEVEL.row * LEVEL.col);
+    var mineArray = new Array(GameInfo.row * GameInfo.col);
     for (var i = 0; i < mineArray.length; i++) {
         mineArray[i] = [];
         mineArray[i][0] = i;
@@ -119,7 +120,7 @@ function createMineArea(pos) {
     // 将选择的位置放到最后
     _swap(mineArray, pos, mineArray.length - 1);
     // 通过shuffle算法确保雷被放到每个位置的概率是均匀的
-    for (var i = 0; i < LEVEL.mines; i++) {
+    for (var i = 0; i < GameInfo.mines; i++) {
         mineArray[i][1] = 9;
     }
     _shuffle(mineArray);
@@ -242,13 +243,13 @@ function openBlock(x, y) {
         return;
     }
     mineArea[x][y].isVisit = true;
-    var id = x * LEVEL.col + y;
+    var id = x * GameInfo.col + y;
     var dom = document.querySelector("#td" + id);
     _removeBorder(dom);
     dom.classList.add(NUMBER_STR[value]);
     // 检查是否胜利
     openBlockNum += 1;
-    if (openBlockNum === LEVEL.row * LEVEL.col - LEVEL.mines) {
+    if (openBlockNum === GameInfo.row * GameInfo.col - GameInfo.mines) {
         gameWin();
         return;
     }
@@ -291,11 +292,11 @@ function gameOver(cell) {
     // 清除时间
     clearTime();
     // 找到所有为雷并且没有被右键进行标记过的格子标记出来
-    for (var i = 0; i < LEVEL.row; i++) {
-        for (var j = 0; j < LEVEL.col; j++) {
+    for (var i = 0; i < GameInfo.row; i++) {
+        for (var j = 0; j < GameInfo.col; j++) {
             if (mineArea[i][j].value === 9 && 
                 mineArea[i][j].isFlag === 0) {
-                var id = i * LEVEL.col + j;
+                var id = i * GameInfo.col + j;
                 var dom = document.querySelector("#td" + id);
                 dom.classList.add("mine");
                 _removeBorder(dom);
@@ -354,7 +355,7 @@ function rightClick(cell) {
  * @param {Number} flagNum 插旗的数量
  */
 function updateLaveMineNum(flagNum) {
-    var laveNum = LEVEL.mines - flagNum;
+    var laveNum = GameInfo.mines - flagNum;
     _drawLaveMines(laveNum);
 }
 

@@ -11,8 +11,8 @@ const D = [
  * @returns 二维坐标
  */
 function _1to2(index) {
-    var x = Math.floor(index / LEVEL.col);
-    var y = index % LEVEL.col;
+    var x = Math.floor(index / GameInfo.col);
+    var y = index % GameInfo.col;
     return {x, y};
 }
 
@@ -75,8 +75,8 @@ function _generateNumbers(array, pos) {
  * @returns 
  */
 function _inArea(x, y) {
-    return x >= 0 && x < LEVEL.row &&
-           y >= 0 && y < LEVEL.col;
+    return x >= 0 && x < GameInfo.row &&
+           y >= 0 && y < GameInfo.col;
 }
 
 // 数字图片路径
