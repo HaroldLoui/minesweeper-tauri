@@ -6,11 +6,11 @@
 }
 
 .container {
-    margin: 0 auto;
+    margin: 5px auto;
     padding-top: 5px;
     padding-bottom: 5px;
     background-color: #ccc;
-    /* border-radius: 5px; */
+    border-radius: 5px;
 }
 
 .header {

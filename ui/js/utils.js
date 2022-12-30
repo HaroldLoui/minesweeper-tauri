@@ -168,3 +168,8 @@ function _drawCurTime(num) {
     var g = num % 10;
     _replaceDigit(gDom, "digit" + g);
 }
+
+// 暂停
+function _sleep(time) {
+    return new Promise(res => setTimeout(res, time));
+}

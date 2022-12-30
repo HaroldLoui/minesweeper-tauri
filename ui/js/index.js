@@ -31,9 +31,9 @@ var timeId = null;
 var cheats = 0;
 // ============== global variables ========
 
-function initData() {
+async function initData() {
     // 初始化游戏页面宽度
-    initWidth();
+    await initWidth();
     // 初始化变量
     initVariables();
     // 创建雷区格子
@@ -65,7 +65,18 @@ function initVariables() {
 /**
  * 初始化游戏页面宽度
  */
-function initWidth() {
+async function initWidth() {
+    if (GameInfo.level === 4) {
+        await _sleep(50);
+        var row = Math.floor(window.innerHeight / 35) - 3;
+        var col = Math.floor(window.innerWidth / 35) - 1;
+        var mines = Math.ceil(row * col * 0.2);
+        var cheat = Math.floor(mines / 10);
+        GameInfo.row = row;
+        GameInfo.col = col;
+        GameInfo.mines = mines;
+        GameInfo.cheat = cheat;
+    } 
     // 根据游戏绘制不同的宽度
     const width = GameInfo.col * 35;
     headerDom.style.width = width + "px";

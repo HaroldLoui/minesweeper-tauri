@@ -6,6 +6,8 @@ const MEDIUM: &str = "medium";
 const HARD: &str = "hard";
 const FULL_SCREEN: &str = "full_screen";
 
+const CHOOSE_MODE: &str = "choose-mode";
+
 // 初始化菜单
 pub fn init_menu() -> Menu {
     // `"quit".to_string()` 是菜单项的id，第二个参数是菜单的名称
@@ -31,32 +33,32 @@ pub fn init_menu() -> Menu {
 // 菜单选择事件
 pub fn menu_event(event: WindowMenuEvent) {
     let window = event.window();
+    window.center().unwrap();
     match event.menu_item_id() {
         // 还是要发事件去触发初始化数据的操作
         SIMPLE => {
+            window.unmaximize().unwrap();
             window.set_size(Size::Physical(PhysicalSize { width: 380, height: 450 })).unwrap();
-            window.center().unwrap();
-            window.emit("choose-mode", GameInfo::simple()).unwrap();
+            window.emit(CHOOSE_MODE, GameInfo::simple()).unwrap();
         }
         MEDIUM => {
+            window.unmaximize().unwrap();
             window.set_size(Size::Physical(PhysicalSize { width: 600, height: 665 })).unwrap();
-            window.center().unwrap();
-            window.emit("choose-mode", GameInfo::medium()).unwrap();
+            window.emit(CHOOSE_MODE, GameInfo::medium()).unwrap();
         }
         HARD => {
+            window.unmaximize().unwrap();
             window.set_size(Size::Physical(PhysicalSize { width: 1080, height: 665 })).unwrap();
-            window.center().unwrap();
-            window.emit("choose-mode", GameInfo::hard()).unwrap();
+            window.emit(CHOOSE_MODE, GameInfo::hard()).unwrap();
         }
         FULL_SCREEN => {
-            window.set_size(Size::Physical(PhysicalSize { width: 1200, height: 690 })).unwrap();
-            window.center().unwrap();
-            window.emit("choose-mode", GameInfo::full_screen()).unwrap();
+            window.maximize().unwrap();
+            window.emit(CHOOSE_MODE, GameInfo::full_screen()).unwrap();
         }
         _ => {}
     }
+    window.center().unwrap();
 }
-
 
 #[derive(Clone, serde::Serialize)]
 struct GameInfo {
@@ -78,6 +80,6 @@ impl GameInfo {
         GameInfo { level: 3, row: 16, col: 30, mines: 99, cheat: 5 }
     }
     pub fn full_screen() -> GameInfo {
-        GameInfo { level: 1, row: 10, col: 10, mines: 10, cheat: 0 }
+        GameInfo { level: 4, row: 10, col: 10, mines: 10, cheat: 0 }
     }
 }
