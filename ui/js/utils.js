@@ -124,7 +124,7 @@ function _drawLaveMines(num) {
     var bDom = document.querySelector("#lb");
     var sDom = document.querySelector("#ls");
     var gDom = document.querySelector("#lg");
-    if (num > 0) {
+    if (num >= 0) {
         // 百分位
         var b = Math.floor(num / 100);
         _replaceDigit(bDom, "digit" + b);

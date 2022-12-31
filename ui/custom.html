@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义</title>
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+<body>
+    <div class="box">
+        <h2>自定义</h2>
+        <div class="input-box">
+            <div>
+                <span>行：</span>
+                <input id="row" type="text"/>
+            </div>
+        </div>
+        <div class="input-box">
+            <div>
+                <span>列：</span>
+                <input id="col" type="text"/>
+            </div>
+        </div>
+        <div class="input-box">
+            <div>
+                <span>雷：</span>
+                <input id="mines" type="text"/>
+            </div>
+        </div>
+        <div class="btn-box">
+            <div>
+                <button onclick="cancel()">取消</button>
+                <button onclick="commit()">确认</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    const { message } = window.__TAURI__.dialog;
+    const { appWindow } = window.__TAURI__.window;
+    const { emit } = window.__TAURI__.event;
+
+    console.log(window.screen.width, window.screen.height);
+    async function cancel() {
+        await appWindow.close();
+    }
+
+    async function commit() {
+        var rValue = document.querySelector("#row").value;
+        var cValue = document.querySelector("#col").value;
+        var mValue = document.querySelector("#mines").value;
+        if (check(rValue) && check(cValue) && check(mValue)) {
+            // 根据行列计算雷数作弊次数
+            var r = parseInt(rValue);
+            var c = parseInt(cValue);
+            var m = parseInt(mValue);
+            const mine = getMine(r, c, m);
+            // 发送事件
+            await emit("custom-mode", mine);
+            // 关闭自定义窗口
+            await appWindow.close();
+        } else {
+            message("请输入数字！！！", "Error");
+        }
+    }
+    
+    // 当前屏幕分辨率最大
+    const maxRow = Math.floor(window.screen.height / 35) - 4;
+    const maxCol = Math.floor(window.screen.width / 35) - 1;
+    const maxMines = Math.ceil(maxRow * maxCol * 0.2);
+    function getMine(r, c, m) {
+        // 输入的行列雷数不能超过最大限制
+        if (r > maxRow) {
+            r = maxRow;
+        }
+        if (c > maxCol) {
+            c = maxCol;
+        }
+        if (m > maxMines) {
+            m = maxMines;
+        }
+        // 最小限制
+        if (r < 10) {
+            r = 10;
+        } 
+        if (c < 10) {
+            c = 10;
+        }
+        if (m <= 0) {
+            m = 1;
+        }
+        // 输入的雷数不能超过总格子的70%
+        var m1 = Math.ceil(r * c * 0.7);
+        if (m > m1) {
+            m = m1;
+        }
+        // 不能小于
+        var m2 = Math.ceil(r * c * 0.2);
+        // 计算可作弊次数，为雷数的10%
+        var c1 = Math.floor(m * 0.1);
+        return {
+            level: 5,
+            row: r,
+            col: c,
+            mines: m,
+            cheat: c1
+        };
+    }
+
+    function check(value) {
+        var flag = value !== null && value !== undefined && value !== "";
+        return flag && !isNaN(Number(value, 10));
+    }
+</script>
+</html>

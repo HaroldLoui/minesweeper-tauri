@@ -1,10 +1,11 @@
-use tauri::{ CustomMenuItem, Menu, MenuItem, Submenu, WindowMenuEvent };
+use tauri::{ CustomMenuItem, Menu, MenuItem, Submenu, WindowMenuEvent, Manager };
 use tauri::{ Size, PhysicalSize };
 
 const SIMPLE: &str = "simple";
 const MEDIUM: &str = "medium";
 const HARD: &str = "hard";
 const FULL_SCREEN: &str = "full_screen";
+const CUSTOM: &str = "custom";
 
 const CHOOSE_MODE: &str = "choose-mode";
 
@@ -15,6 +16,7 @@ pub fn init_menu() -> Menu {
     let medium_menu = CustomMenuItem::new(MEDIUM.to_string(), "中级");
     let hard_menu = CustomMenuItem::new(HARD.to_string(), "高级");
     let full_screen_menu = CustomMenuItem::new(FULL_SCREEN.to_string(), "满屏");
+    let custom_menu = CustomMenuItem::new(CUSTOM.to_string(), "自定义");
     // let close = CustomMenuItem::new("close".to_string(), "Close");
     let game_sub_menu = Submenu::new(
         "游戏",
@@ -22,7 +24,8 @@ pub fn init_menu() -> Menu {
             .add_item(simple_menu)
             .add_item(medium_menu)
             .add_item(hard_menu)
-            .add_item(full_screen_menu),
+            .add_item(full_screen_menu)
+            .add_item(custom_menu)
     );
     Menu::new()
         .add_native_item(MenuItem::Copy)
@@ -38,22 +41,35 @@ pub fn menu_event(event: WindowMenuEvent) {
         // 还是要发事件去触发初始化数据的操作
         SIMPLE => {
             window.unmaximize().unwrap();
-            window.set_size(Size::Physical(PhysicalSize { width: 380, height: 450 })).unwrap();
+            window.set_size(Size::Physical(PhysicalSize { width: 1200, height: 800 })).unwrap();
             window.emit(CHOOSE_MODE, GameInfo::simple()).unwrap();
         }
         MEDIUM => {
             window.unmaximize().unwrap();
-            window.set_size(Size::Physical(PhysicalSize { width: 600, height: 665 })).unwrap();
+            window.set_size(Size::Physical(PhysicalSize { width: 1200, height: 800 })).unwrap();
             window.emit(CHOOSE_MODE, GameInfo::medium()).unwrap();
         }
         HARD => {
             window.unmaximize().unwrap();
-            window.set_size(Size::Physical(PhysicalSize { width: 1080, height: 665 })).unwrap();
+            window.set_size(Size::Physical(PhysicalSize { width: 1200, height: 800 })).unwrap();
             window.emit(CHOOSE_MODE, GameInfo::hard()).unwrap();
         }
         FULL_SCREEN => {
             window.maximize().unwrap();
             window.emit(CHOOSE_MODE, GameInfo::full_screen()).unwrap();
+        }
+        CUSTOM => {
+            let handle = window.app_handle();
+            std::thread::spawn(move || {
+                let custom_window = tauri::WindowBuilder::new(
+                    &handle,
+                    "custom",
+                    tauri::WindowUrl::App("custom.html".into())
+                ).build().unwrap();
+                custom_window.center().unwrap();
+                custom_window.set_size(Size::Physical(PhysicalSize { width: 350, height: 350 })).unwrap();
+                custom_window.set_resizable(false).unwrap();
+            });
         }
         _ => {}
     }
@@ -61,7 +77,7 @@ pub fn menu_event(event: WindowMenuEvent) {
 }
 
 #[derive(Clone, serde::Serialize)]
-struct GameInfo {
+pub struct GameInfo {
     level: u32, // 当前等级
     row: u32,   // 行
     col: u32,   // 列

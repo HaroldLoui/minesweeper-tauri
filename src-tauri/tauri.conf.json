@@ -12,7 +12,13 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false
+      "all": false,
+      "dialog": {
+        "all": true
+      },
+      "window": {
+        "close": true
+      }
     },
     "bundle": {
       "active": true,
@@ -56,8 +62,8 @@
     "windows": [
       {
         "fullscreen": false,
-        "width": 380,
-        "height": 450,
+        "width": 1200,
+        "height": 800,
         "resizable": true,
         "title": "minesweeper",
         "center": true

@@ -9,12 +9,22 @@ var GameInfo = {
     cheat: 0   // 可作弊次数
 };
 
-// choose-mode
-const unlisten = async () => {
+// 监听菜单选择事件
+const chooseMode = async () => {
     return await listen("choose-mode", (event) => {
         // console.log(event.payload);
         GameInfo = event.payload;
         initData();
     });
 };
-unlisten();
+chooseMode();
+
+// 监听自定义事件
+const customMode = async () => {
+    return await listen("custom-mode", (event) => {
+        console.log(event.payload);
+        GameInfo = event.payload;
+        initData();
+    });
+};
+customMode();
