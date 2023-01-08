@@ -6,6 +6,7 @@ const MEDIUM: &str = "medium";
 const HARD: &str = "hard";
 const FULL_SCREEN: &str = "full_screen";
 const CUSTOM: &str = "custom";
+const RANK: &str = "rank";
 
 const CHOOSE_MODE: &str = "choose-mode";
 
@@ -17,7 +18,7 @@ pub fn init_menu() -> Menu {
     let hard_menu = CustomMenuItem::new(HARD.to_string(), "高级");
     let full_screen_menu = CustomMenuItem::new(FULL_SCREEN.to_string(), "满屏");
     let custom_menu = CustomMenuItem::new(CUSTOM.to_string(), "自定义");
-    // let close = CustomMenuItem::new("close".to_string(), "Close");
+    let rank_menu = CustomMenuItem::new(RANK.to_string(), "排行榜");
     let game_sub_menu = Submenu::new(
         "游戏",
         Menu::new()
@@ -26,6 +27,7 @@ pub fn init_menu() -> Menu {
             .add_item(hard_menu)
             .add_item(full_screen_menu)
             .add_item(custom_menu)
+            .add_item(rank_menu)
     );
     Menu::new()
         .add_native_item(MenuItem::Copy)
@@ -66,14 +68,32 @@ pub fn menu_event(event: WindowMenuEvent) {
                     "custom",
                     tauri::WindowUrl::App("custom.html".into())
                 ).build().unwrap();
+                custom_window.set_title("自定义").unwrap();
                 custom_window.center().unwrap();
                 custom_window.set_size(Size::Physical(PhysicalSize { width: 350, height: 350 })).unwrap();
                 custom_window.set_resizable(false).unwrap();
             });
         }
+        RANK => {
+            let handle = window.app_handle();
+            open_rank_window(handle);
+        }
         _ => {}
     }
     window.center().unwrap();
+}
+
+// 打开rank窗口
+pub fn open_rank_window(handle: tauri::AppHandle) {
+    let rank_window = tauri::WindowBuilder::new(
+        &handle,
+        "rank",
+        tauri::WindowUrl::App("rank.html".into())
+    ).build().unwrap();
+    rank_window.set_title("排行榜").unwrap();
+    rank_window.center().unwrap();
+    rank_window.set_size(Size::Physical(PhysicalSize { width: 600, height: 600 })).unwrap();
+    rank_window.set_resizable(false).unwrap();
 }
 
 #[derive(Clone, serde::Serialize)]

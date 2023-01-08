@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/rank.css">
+</head>
+<body>
+    <div class="tab-ui">
+        <div class="tab">
+            <div class="tab-title tab-title-active" id="tab1" onclick="show(1)">
+                <a>初级</a>
+            </div>
+            <div class="tab-title" id="tab2" onclick="show(2)">
+                <a>中级</a>
+            </div>
+            <div class="tab-title" id="tab3" onclick="show(3)">
+                <a>高级</a>
+            </div>
+            <div class="tab-title" id="tab4" onclick="show(4)">
+                <a>满屏</a>
+            </div>
+            <div class="tab-title" id="tab5" onclick="show(5)">
+                <a>自定义</a>
+            </div>
+        </div>
+        <div class="content">
+            <div class="tab-content" id="content1">
+            </div>
+            <div class="tab-content" id="content2" style="display: none;">
+            </div>
+            <div class="tab-content" id="content3" style="display: none;">
+            </div>
+            <div class="tab-content" id="content4" style="display: none;">
+            </div>
+            <div class="tab-content" id="content5" style="display: none;">
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    const { invoke } = window.__TAURI__.tauri;
+
+    invoke("get_rank_list").then((res) => {
+        var rankArray = initRankArray();
+        var array = res.trim().split("\n");
+        array.forEach((item) => {
+            var ss = item.split(" ");
+            switch (ss[0]) {
+                case "1":
+                    rankArray[0].push({
+                        level: 1,
+                        player: ss[1],
+                        time: parseInt(ss[2])
+                    });
+                    break;
+                case "2":
+                    rankArray[1].push({
+                        level: 2,
+                        player: ss[1],
+                        time: parseInt(ss[2])
+                    });
+                    break;
+                case "3":
+                    rankArray[2].push({
+                        level: 3,
+                        player: ss[1],
+                        time: parseInt(ss[2])
+                    });
+                    break;
+                case "4":
+                    rankArray[3].push({
+                        level: 4,
+                        player: ss[1],
+                        time: parseInt(ss[2])
+                    });
+                    break;
+                case "5":
+                    rankArray[4].push({
+                        level: 5,
+                        player: ss[1],
+                        time: parseInt(ss[2])
+                    });
+                    break;
+                default: break;
+            }
+        });
+        rankArray.map((arr) => {
+            arr.sort((o1, o2) => {
+                return o1.time - o2.time;
+            });
+            return arr;
+        }).forEach((arr, index) => {
+            var dom = document.querySelector("#content" + (index + 1));
+            dom.innerHTML = "";
+            arr.forEach((obj, i) => {
+                var div = document.createElement("div");
+                div.classList.add("rank-li");
+                div.innerHTML = (i + 1) + " " + obj.player + " " + obj.time;
+                dom.appendChild(div);
+            });
+        })
+    });
+
+    function initRankArray() {
+        var rankArray = [];
+        for (var i = 0; i < 5; i++) {
+            rankArray[i] = [];
+        }
+        return rankArray;
+    }
+
+    function show(active) {
+        for (var i = 1; i < 6; i++) {
+            document.querySelector("#tab" + i).classList.remove("tab-title-active");
+            document.querySelector("#content" + i).style.display = "none";
+        }
+        document.querySelector("#tab" + active).classList.add("tab-title-active");
+        document.querySelector("#content" + active).style.display = "block";
+    }
+</script>
+</html>

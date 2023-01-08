@@ -1,4 +1,5 @@
 const { listen } = window.__TAURI__.event;
+const { invoke } = window.__TAURI__.tauri;
 
 // 当前游戏级别
 var GameInfo = {
@@ -22,7 +23,7 @@ chooseMode();
 // 监听自定义事件
 const customMode = async () => {
     return await listen("custom-mode", (event) => {
-        console.log(event.payload);
+        // console.log(event.payload);
         GameInfo = event.payload;
         initData();
     });

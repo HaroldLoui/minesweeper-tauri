@@ -288,7 +288,7 @@ function gameWin() {
     // 清除时间
     clearTime();
     // TODO: 排行榜
-    console.log("You win");
+    invoke("rank", { time: curTime, level: GameInfo.level });
 }
 
 /**
