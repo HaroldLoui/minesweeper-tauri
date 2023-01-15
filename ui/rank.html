@@ -1,124 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
     <link rel="stylesheet" href="css/rank.css">
 </head>
+
 <body>
-    <div class="tab-ui">
-        <div class="tab">
-            <div class="tab-title tab-title-active" id="tab1" onclick="show(1)">
-                <a>初级</a>
+    <div class="tabs">
+        <nav>
+            <a href="javascript:;" data-cont="content1" class="active">初级</a>
+            <a href="javascript:;" data-cont="content2">中级</a>
+            <a href="javascript:;" data-cont="content3">高级</a>
+            <a href="javascript:;" data-cont="content4">满屏</a>
+            <a href="javascript:;" data-cont="content5">自定义</a>
+        </nav>
+        <section class="cont" id="content1" style="display: block">
+            <div class="top">
+                <ul>
+                    <li>
+                        <div>username</div>
+                        <div>14</div>
+                    </li>
+                </ul>
             </div>
-            <div class="tab-title" id="tab2" onclick="show(2)">
-                <a>中级</a>
+        </section>
+        <section class="cont" id="content2">
+            <div class="top">
+                <ul>
+                    <li>
+                        <div>username</div>
+                        <div>41</div>
+                    </li>
+                </ul>
             </div>
-            <div class="tab-title" id="tab3" onclick="show(3)">
-                <a>高级</a>
+        </section>
+        <section class="cont" id="content3">
+            <div class="top">
+                <ul>
+                    <li>
+                        <div>username</div>
+                        <div>140</div>
+                    </li>
+                </ul>
             </div>
-            <div class="tab-title" id="tab4" onclick="show(4)">
-                <a>满屏</a>
+        </section>
+        <section class="cont" id="content4">
+            <div class="top">
+                <ul>
+                    <li>
+                        <div>username</div>
+                        <div>1400</div>
+                    </li>
+                </ul>
             </div>
-            <div class="tab-title" id="tab5" onclick="show(5)">
-                <a>自定义</a>
+        </section>
+        </section>
+        <section class="cont" id="content5">
+            <div class="top">
+                <ul>
+                    <li>
+                        <div>username</div>
+                        <div>1431</div>
+                    </li>
+                </ul>
             </div>
-        </div>
-        <div class="content">
-            <div class="tab-content" id="content1">
-            </div>
-            <div class="tab-content" id="content2" style="display: none;">
-            </div>
-            <div class="tab-content" id="content3" style="display: none;">
-            </div>
-            <div class="tab-content" id="content4" style="display: none;">
-            </div>
-            <div class="tab-content" id="content5" style="display: none;">
-            </div>
-        </div>
+        </section>
     </div>
 </body>
-<script>
-    const { invoke } = window.__TAURI__.tauri;
-
-    invoke("get_rank_list").then((res) => {
-        var rankArray = initRankArray();
-        var array = res.trim().split("\n");
-        array.forEach((item) => {
-            var ss = item.split(" ");
-            switch (ss[0]) {
-                case "1":
-                    rankArray[0].push({
-                        level: 1,
-                        player: ss[1],
-                        time: parseInt(ss[2])
-                    });
-                    break;
-                case "2":
-                    rankArray[1].push({
-                        level: 2,
-                        player: ss[1],
-                        time: parseInt(ss[2])
-                    });
-                    break;
-                case "3":
-                    rankArray[2].push({
-                        level: 3,
-                        player: ss[1],
-                        time: parseInt(ss[2])
-                    });
-                    break;
-                case "4":
-                    rankArray[3].push({
-                        level: 4,
-                        player: ss[1],
-                        time: parseInt(ss[2])
-                    });
-                    break;
-                case "5":
-                    rankArray[4].push({
-                        level: 5,
-                        player: ss[1],
-                        time: parseInt(ss[2])
-                    });
-                    break;
-                default: break;
-            }
-        });
-        rankArray.map((arr) => {
-            arr.sort((o1, o2) => {
-                return o1.time - o2.time;
-            });
-            return arr;
-        }).forEach((arr, index) => {
-            var dom = document.querySelector("#content" + (index + 1));
-            dom.innerHTML = "";
-            arr.forEach((obj, i) => {
-                var div = document.createElement("div");
-                div.classList.add("rank-li");
-                div.innerHTML = (i + 1) + " " + obj.player + " " + obj.time;
-                dom.appendChild(div);
-            });
-        })
-    });
-
-    function initRankArray() {
-        var rankArray = [];
-        for (var i = 0; i < 5; i++) {
-            rankArray[i] = [];
-        }
-        return rankArray;
-    }
-
-    function show(active) {
-        for (var i = 1; i < 6; i++) {
-            document.querySelector("#tab" + i).classList.remove("tab-title-active");
-            document.querySelector("#content" + i).style.display = "none";
-        }
-        document.querySelector("#tab" + active).classList.add("tab-title-active");
-        document.querySelector("#content" + active).style.display = "block";
-    }
-</script>
+<script src="js/rank.js"></script>
 </html>

@@ -85,11 +85,16 @@ pub fn menu_event(event: WindowMenuEvent) {
 
 // 打开rank窗口
 pub fn open_rank_window(handle: tauri::AppHandle) {
-    let rank_window = tauri::WindowBuilder::new(
+    let rank_window = match tauri::WindowBuilder::new(
         &handle,
         "rank",
         tauri::WindowUrl::App("rank.html".into())
-    ).build().unwrap();
+    ).build() {
+        Ok(rank_window) => rank_window,
+        Err(_err) => {
+            return;
+        }
+    };
     rank_window.set_title("排行榜").unwrap();
     rank_window.center().unwrap();
     rank_window.set_size(Size::Physical(PhysicalSize { width: 600, height: 600 })).unwrap();
