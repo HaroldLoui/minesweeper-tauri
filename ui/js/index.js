@@ -226,6 +226,9 @@ function bindPlayEvent() {
     };
 }
 
+var isChange = true;
+var flagBlocks = [];
+var emptyBlocks = [];
 /**
  * 左键点击事件
  * @param {Element} cell 
@@ -233,8 +236,61 @@ function bindPlayEvent() {
 function leftClick(cell) {
     var id = cell.dataset.id;
     const {x, y} = _1to2(id);
-    // 已经被打开或者被标记了旗子和问号的格子不能被点击
-    if (_inArea(x, y) && mineArea[x][y].isVisit || mineArea[x][y].isFlag > 0) {
+    // 被标记了旗子和问号的格子不能被点击
+    if (_inArea(x, y) && mineArea[x][y].isFlag > 0) {
+        return;
+    }
+    // 已经被打开但是是数字格子，点击当前格子打开周围非雷格子
+    if (mineArea[x][y].isVisit) {
+        if (mineArea[x][y].value > 0 && mineArea[x][y].value <= 7) {
+            // 如果当前格子周围的插旗数量等于当前格子的值，则打开剩余未打开的格子
+            const value = mineArea[x][y].value;
+            flagBlocks = [];
+            emptyBlocks = [];
+            for (var i = 0; i < 8; i++) {
+                var x1 = x + D[i][0];
+                var y1 = y + D[i][1];
+                if (_inArea(x1, y1)) {
+                    var id = x1 * GameInfo.col + y1;
+                    var dom = document.querySelector("#td" + id);
+                    if (dom.classList.contains("flag")) {
+                        flagBlocks.push({x: x1, y: y1});
+                    } else {
+                        if (!mineArea[x1][y1].isVisit && mineArea[x1][y1].isFlag === 0) {
+                            emptyBlocks.push({x: x1, y: y1});
+                        }
+                    }
+                }
+            }
+            isChange = true;
+            cell.onmousedown = async () => {
+                await _sleep(50);
+                if (isChange) {
+                    emptyBlocks.forEach((point) => {
+                        var id = point.x * GameInfo.col + point.y;
+                        var dom = document.querySelector("#td" + id);
+                        dom.style.borderColor = "#a1a1a1 #fff #fff #a1a1a1";
+                    });
+                }
+            };
+            cell.onmouseup = async () => {
+                await _sleep(50);
+                if (isChange) {
+                    emptyBlocks.forEach((point) => {
+                        var id = point.x * GameInfo.col + point.y;
+                        var dom = document.querySelector("#td" + id);
+                        dom.style.borderColor = "#fff #a1a1a1 #a1a1a1 #fff";
+                    });
+                }
+            };
+            if (flagBlocks.length === value) {
+                // 打开格子
+                emptyBlocks.forEach((point) => {
+                    openBlock(point.x, point.y, 1);
+                });
+                isChange = false;
+            }
+        }
         return;
     }
     // 踩到雷了
@@ -250,15 +306,23 @@ function leftClick(cell) {
  * 打开当前格子
  * @param {Number} x 
  * @param {Number} y 
+ * @param {Number} type 0-人为点击 1-自动打开的
  */
-function openBlock(x, y) {
+function openBlock(x, y, type = 0) {
     const value = mineArea[x][y].value;
-    if (value === 9 || mineArea[x][y].isVisit) {
+    if (mineArea[x][y].isVisit) {
         return;
     }
     mineArea[x][y].isVisit = true;
     var id = x * GameInfo.col + y;
     var dom = document.querySelector("#td" + id);
+    if (value === 9) {
+        // 如果是自动打开，则表示有旗子插错的情况，这种场景直接判负
+        if (type !== 0) {
+            gameOver(dom);
+        }
+        return;
+    }
     _removeBorder(dom);
     dom.classList.add(NUMBER_STR[value]);
     // 如果启用了自动插旗
