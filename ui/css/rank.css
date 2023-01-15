@@ -39,9 +39,9 @@ nav a.active {
 }
 
 .cont {
-    overflow: hidden;
     display: none;
     height: 460px;
+    overflow: auto;
 }
 
 .top {

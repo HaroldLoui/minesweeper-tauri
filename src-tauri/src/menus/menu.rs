@@ -7,8 +7,13 @@ const HARD: &str = "hard";
 const FULL_SCREEN: &str = "full_screen";
 const CUSTOM: &str = "custom";
 const RANK: &str = "rank";
+const AUTO_FLAG: &str = "auto_flag";
 
-const CHOOSE_MODE: &str = "choose-mode";
+const CHOOSE_MODE_EVENT_NAME: &str = "choose-mode";
+const AUTO_FLAG_EVENT_NAME: &str = "auto-flag";
+
+// 是否自动插旗标志
+static mut IS_AUTO_FLAG: bool = false;
 
 // 初始化菜单
 pub fn init_menu() -> Menu {
@@ -19,6 +24,7 @@ pub fn init_menu() -> Menu {
     let full_screen_menu = CustomMenuItem::new(FULL_SCREEN.to_string(), "满屏");
     let custom_menu = CustomMenuItem::new(CUSTOM.to_string(), "自定义");
     let rank_menu = CustomMenuItem::new(RANK.to_string(), "排行榜");
+    let auto_flag_menu = CustomMenuItem::new(AUTO_FLAG.to_string(), "[  ] 自动插旗");
     let game_sub_menu = Submenu::new(
         "游戏",
         Menu::new()
@@ -27,12 +33,15 @@ pub fn init_menu() -> Menu {
             .add_item(hard_menu)
             .add_item(full_screen_menu)
             .add_item(custom_menu)
-            .add_item(rank_menu)
+    );
+    let help_sub_menu = Submenu::new(
+        "帮助",
+        Menu::new().add_item(auto_flag_menu).add_item(rank_menu)
     );
     Menu::new()
         .add_native_item(MenuItem::Copy)
         .add_submenu(game_sub_menu)
-        .add_item(CustomMenuItem::new("help", "帮助"))
+        .add_submenu(help_sub_menu)
 }
 
 // 菜单选择事件
@@ -44,21 +53,21 @@ pub fn menu_event(event: WindowMenuEvent) {
         SIMPLE => {
             window.unmaximize().unwrap();
             window.set_size(Size::Physical(PhysicalSize { width: 1200, height: 800 })).unwrap();
-            window.emit(CHOOSE_MODE, GameInfo::simple()).unwrap();
+            window.emit(CHOOSE_MODE_EVENT_NAME, GameInfo::simple()).unwrap();
         }
         MEDIUM => {
             window.unmaximize().unwrap();
             window.set_size(Size::Physical(PhysicalSize { width: 1200, height: 800 })).unwrap();
-            window.emit(CHOOSE_MODE, GameInfo::medium()).unwrap();
+            window.emit(CHOOSE_MODE_EVENT_NAME, GameInfo::medium()).unwrap();
         }
         HARD => {
             window.unmaximize().unwrap();
             window.set_size(Size::Physical(PhysicalSize { width: 1200, height: 800 })).unwrap();
-            window.emit(CHOOSE_MODE, GameInfo::hard()).unwrap();
+            window.emit(CHOOSE_MODE_EVENT_NAME, GameInfo::hard()).unwrap();
         }
         FULL_SCREEN => {
             window.maximize().unwrap();
-            window.emit(CHOOSE_MODE, GameInfo::full_screen()).unwrap();
+            window.emit(CHOOSE_MODE_EVENT_NAME, GameInfo::full_screen()).unwrap();
         }
         CUSTOM => {
             let handle = window.app_handle();
@@ -77,6 +86,21 @@ pub fn menu_event(event: WindowMenuEvent) {
         RANK => {
             let handle = window.app_handle();
             open_rank_window(handle);
+        }
+        AUTO_FLAG => {
+            let menu_handle = window.menu_handle();
+            let borrow_window = window.clone();
+            std::thread::spawn(move || {
+                unsafe {
+                    IS_AUTO_FLAG = !IS_AUTO_FLAG;
+                    if IS_AUTO_FLAG {
+                        menu_handle.get_item(AUTO_FLAG).set_title("[✅] 自动游戏").unwrap();
+                    } else {
+                        menu_handle.get_item(AUTO_FLAG).set_title("[  ] 自动游戏").unwrap();
+                    }
+                    borrow_window.emit(AUTO_FLAG_EVENT_NAME, IS_AUTO_FLAG).unwrap();
+                }
+            });
         }
         _ => {}
     }

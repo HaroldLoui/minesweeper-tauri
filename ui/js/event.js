@@ -9,6 +9,8 @@ var GameInfo = {
     mines: 10, // 雷数
     cheat: 0   // 可作弊次数
 };
+// 是否自动插旗
+var isAutoFlag = false;
 
 // 监听菜单选择事件
 const chooseMode = async () => {
@@ -29,3 +31,12 @@ const customMode = async () => {
     });
 };
 customMode();
+
+// 监听自动插旗事件
+const autoFlagMode = async () => {
+    return await listen("auto-flag", (event) => {
+        isAutoFlag = event.payload;
+        console.log(isAutoFlag);
+    });
+};
+autoFlagMode();

@@ -13,7 +13,7 @@ const D = [
 function _1to2(index) {
     var x = Math.floor(index / GameInfo.col);
     var y = index % GameInfo.col;
-    return {x, y};
+    return { x, y };
 }
 
 /**

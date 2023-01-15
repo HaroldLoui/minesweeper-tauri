@@ -29,6 +29,8 @@ var curTime = 0;
 var timeId = null;
 //作弊次数
 var cheats = 0;
+// 自动插旗
+var autoFlagMap = new Map();
 // ============== global variables ========
 
 async function initData() {
@@ -60,6 +62,7 @@ function initVariables() {
     flagNum = 0;
     curTime = 0;
     cheats = GameInfo.cheat;
+    autoFlagMap.clear();
 }
 
 /**
@@ -231,7 +234,7 @@ function leftClick(cell) {
     var id = cell.dataset.id;
     const {x, y} = _1to2(id);
     // 已经被打开或者被标记了旗子和问号的格子不能被点击
-    if (mineArea[x][y].isVisit || mineArea[x][y].isFlag > 0) {
+    if (_inArea(x, y) && mineArea[x][y].isVisit || mineArea[x][y].isFlag > 0) {
         return;
     }
     // 踩到雷了
@@ -258,6 +261,11 @@ function openBlock(x, y) {
     var dom = document.querySelector("#td" + id);
     _removeBorder(dom);
     dom.classList.add(NUMBER_STR[value]);
+    // 如果启用了自动插旗
+    if (isAutoFlag && (value >= 1 && value <= 8)) {
+        autoFlagMap.set(id, { value: value, isRemove: false });
+        autoFlag();
+    }
     // 检查是否胜利
     openBlockNum += 1;
     if (openBlockNum === GameInfo.row * GameInfo.col - GameInfo.mines) {
@@ -278,6 +286,43 @@ function openBlock(x, y) {
 }
 
 /**
+ * 自动插旗方法
+ */
+function autoFlag() {
+    for (var [key, obj] of autoFlagMap) {
+        if (!obj.isRemove) {
+            const {x, y} = _1to2(key);
+            var notOpenBlockNum = 0;
+            var notOpenBlockDivList = [];
+            for (var i = 0; i < 8; i++) {
+                var x1 = x + D[i][0];
+                var y1 = y + D[i][1];
+                if (_inArea(x1, y1) && !mineArea[x1][y1].isVisit) {
+                    notOpenBlockNum++;
+                    const tdId = x1 * GameInfo.col + y1;
+                    notOpenBlockDivList.push(document.querySelector("#td" + tdId));
+                }
+            }
+            if (notOpenBlockNum === obj.value) {
+                for (var i = 0; i < notOpenBlockDivList.length; i++) {
+                    var div = notOpenBlockDivList[i];
+                    var id = div.dataset.id;
+                    var x2 = Math.floor(id / GameInfo.col);
+                    var y2 = id % GameInfo.col;
+                    if (mineArea[x2][y2].isFlag === 0) {
+                        div.classList.add("flag");
+                        mineArea[x2][y2].isFlag = 1;
+                        flagNum++;
+                        updateLaveMineNum(flagNum);
+                    }
+                }
+                obj.isRemove = true;
+            }
+        }
+    }
+}
+
+/**
  * 游戏胜利逻辑
  */
 function gameWin() {
@@ -287,7 +332,7 @@ function gameWin() {
     _changeSmile(2);
     // 清除时间
     clearTime();
-    // TODO: 排行榜
+    // 排行榜
     invoke("rank", { time: curTime, level: GameInfo.level });
 }
 
