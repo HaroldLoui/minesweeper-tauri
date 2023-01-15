@@ -155,6 +155,7 @@ function _drawLaveMines(num) {
  * @param {Number} num 
  */
 function _drawCurTime(num) {
+    num = num > 999 ? 999 : num;
     var bDom = document.querySelector("#tb");
     var sDom = document.querySelector("#ts");
     var gDom = document.querySelector("#tg");
