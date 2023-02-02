@@ -94,9 +94,9 @@ pub fn menu_event(event: WindowMenuEvent) {
                 unsafe {
                     IS_AUTO_FLAG = !IS_AUTO_FLAG;
                     if IS_AUTO_FLAG {
-                        menu_handle.get_item(AUTO_FLAG).set_title("[✅] 自动游戏").unwrap();
+                        menu_handle.get_item(AUTO_FLAG).set_title("[✅] 自动插旗").unwrap();
                     } else {
-                        menu_handle.get_item(AUTO_FLAG).set_title("[  ] 自动游戏").unwrap();
+                        menu_handle.get_item(AUTO_FLAG).set_title("[  ] 自动插旗").unwrap();
                     }
                     borrow_window.emit(AUTO_FLAG_EVENT_NAME, IS_AUTO_FLAG).unwrap();
                 }
